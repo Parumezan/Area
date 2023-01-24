@@ -1,0 +1,7 @@
+# Production environment override
+services:
+  client_web:
+    container_name: client_web
+    environment:
+      NODE_ENV: production
+      BACK_URL: ${BACK_URL}

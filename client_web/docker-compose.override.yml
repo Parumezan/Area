@@ -1,0 +1,9 @@
+# Development environment override
+services:
+  client_web:
+    container_name: client_web_dev
+    ports:
+      - ${FRONT_PORT}:${FRONT_PORT}
+    environment:
+      NODE_ENV: development
+      BACK_URL: ${BACK_URL}

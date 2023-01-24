@@ -1,0 +1,8 @@
+services:
+  client_web:
+    build:
+      context: .
+      target: client_web
+    restart: unless-stopped
+    volumes:
+      - ./:/app
