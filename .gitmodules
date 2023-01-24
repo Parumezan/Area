@@ -1,9 +1,0 @@
-[submodule "server"]
-	path = server
-	url = https://gitlab.com/areamogus/server.git
-[submodule "client_mobile"]
-	path = client_mobile
-	url = https://gitlab.com/areamogus/client-mobile.git
-[submodule "client_web"]
-	path = client_web
-	url = https://gitlab.com/areamogus/client-web.git
