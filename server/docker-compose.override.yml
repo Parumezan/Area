@@ -1,0 +1,8 @@
+# Development environment override
+services:
+  server:
+    container_name: server
+    ports:
+      - ${BACK_PORT}:${BACK_PORT}
+    environment:
+      NODE_ENV: development
