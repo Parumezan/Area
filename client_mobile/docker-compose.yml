@@ -1,0 +1,7 @@
+services:
+  client-mobile:
+    build:
+      context: .
+      target: client-mobile
+    volumes:
+      - ./build:/app/build/
