@@ -2,6 +2,6 @@ services:
   client-mobile:
     build:
       context: .
-      target: client-mobile
+      target: client_mobile
     volumes:
       - ./build:/app/build/
