@@ -1,7 +1,7 @@
 stages:
   - ✅ install
   - 🖌 format
-  # - 🧪 tests
+  - 🧪 tests
   - 🛠 build
   - 📦 update
 
@@ -53,15 +53,16 @@ prettier:
   except:
     - tags
 
-# tests:
-#   image: $NODE_IMAGE
-#   stage: 🧪 tests
-#   cache:
-#     - *node_modules_cache
-#   script:
-#     - npm run test
-#   except:
-#     - tags
+tests:
+  image: $NODE_IMAGE
+  stage: 🧪 tests
+  cache:
+    - *node_modules_cache
+  script:
+    - npx prisma generate
+    - npm run test
+  except:
+    - tags
 
 build:
   image: $NODE_IMAGE
