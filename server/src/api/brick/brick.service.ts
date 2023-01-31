@@ -1,5 +1,7 @@
 import { Injectable, Inject, HttpException } from '@nestjs/common';
 import { Brick, PrismaClient } from '@prisma/client';
+import { UpdateBrickDto } from './dto/update-brick.dto';
+import { CreateBrickDto } from './dto/create-brick.dto';
 
 @Injectable()
 export class BrickService {
@@ -13,7 +15,7 @@ export class BrickService {
     });
   }
 
-  async createBrick(accountId: number, brick: Brick): Promise<Brick> {
+  async createBrick(accountId: number, brick: CreateBrickDto): Promise<Brick> {
     return this.prisma.brick.create({
       data: {
         title: brick.title,
@@ -38,7 +40,7 @@ export class BrickService {
   async updateBrick(
     accountId: number,
     id: number,
-    data: Brick,
+    data: UpdateBrickDto,
   ): Promise<Brick> {
     const brick = await this.prisma.brick.findUnique({
       where: { id: id },

@@ -1,5 +1,7 @@
 import { Injectable, Inject, HttpException } from '@nestjs/common';
 import { Action, PrismaClient } from '@prisma/client';
+import { CreateActionDto } from './dto/create-action.dto';
+import { UpdateActionDto } from './dto/update-action.dto';
 
 @Injectable()
 export class ActionService {
@@ -36,7 +38,10 @@ export class ActionService {
     });
   }
 
-  async createAction(accountId: number, action: Action): Promise<Action> {
+  async createAction(
+    accountId: number,
+    action: CreateActionDto,
+  ): Promise<Action> {
     const brick = await this.prisma.brick.findUnique({
       where: { id: action.brickId },
     });
@@ -72,7 +77,7 @@ export class ActionService {
   async updateAction(
     accountId: number,
     id: number,
-    data: Action,
+    data: UpdateActionDto,
   ): Promise<Action> {
     const action = await this.prisma.action.findUnique({
       where: { id: id },

@@ -3,15 +3,17 @@ import {
   UseGuards,
   Get,
   Post,
-  Put,
+  Patch,
   Delete,
   Param,
   Body,
   Req,
 } from '@nestjs/common';
 import { ActionService } from './action.service';
-import { Action } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBody } from '@nestjs/swagger';
+import { CreateActionDto } from './dto/create-action.dto';
+import { UpdateActionDto } from './dto/update-action.dto';
 
 @Controller('api/action')
 export class ActionController {
@@ -25,34 +27,52 @@ export class ActionController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('/brick:brickId')
-  readActionsFromBrick(@Req() req: any, @Param('brickId') brickId: string) {
-    return this.actionService.readActionsFromBrick(
-      req.user.id,
-      parseInt(brickId),
-    );
+  readActionsFromBrick(@Req() req: any, @Param('brickId') brickId: number) {
+    return this.actionService.readActionsFromBrick(req.user.id, brickId);
   }
 
+  @ApiBody({
+    type: CreateActionDto,
+    required: true,
+    description: 'Create action',
+    examples: {
+      brick: {
+        value: {
+          brickId: 1,
+          actionType: 'EVEN_MINUTE',
+          description: 'This is a description',
+          isInput: true,
+          arguments: [],
+          serviceId: 1,
+        },
+      },
+    },
+  })
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  createAction(@Req() req: any, @Body() body: Action) {
+  createAction(@Req() req: any, @Body() body: CreateActionDto) {
     return this.actionService.createAction(req.user.id, body);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  readAction(@Req() req: any, @Param('id') id: string) {
-    return this.actionService.readAction(req.user.id, parseInt(id));
+  readAction(@Req() req: any, @Param('id') id: number) {
+    return this.actionService.readAction(req.user.id, id);
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Put(':id')
-  updateAction(@Req() req: any, @Param('id') id: string, @Body() body: Action) {
-    return this.actionService.updateAction(req.user.id, parseInt(id), body);
+  @Patch(':id')
+  updateAction(
+    @Req() req: any,
+    @Param('id') id: number,
+    @Body() body: UpdateActionDto,
+  ) {
+    return this.actionService.updateAction(req.user.id, id, body);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
-  deleteAction(@Req() req: any, @Param('id') id: string) {
-    return this.actionService.deleteAction(req.user.id, parseInt(id));
+  deleteAction(@Req() req: any, @Param('id') id: number) {
+    return this.actionService.deleteAction(req.user.id, id);
   }
 }
