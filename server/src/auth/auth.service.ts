@@ -1,6 +1,7 @@
 import { Injectable, Inject, HttpException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Account, PrismaClient } from '@prisma/client';
+import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -28,7 +29,7 @@ export class AuthService {
     return user;
   }
 
-  async login(user: Account) {
+  async login(user: LoginDto) {
     const DBuser = await this.validateUser(user.email, user.password);
     if (!DBuser) {
       throw new HttpException('Forbidden', 403);
@@ -41,7 +42,7 @@ export class AuthService {
     };
   }
 
-  async register(user: Account) {
+  async register(user: LoginDto) {
     if (
       await this.prisma.account.findUnique({ where: { email: user.email } })
     ) {
