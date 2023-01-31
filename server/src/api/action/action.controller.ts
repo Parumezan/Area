@@ -39,11 +39,11 @@ export class ActionController {
       brick: {
         value: {
           brickId: 1,
-          actionType: 'EVEN_MINUTE',
-          description: 'This is a description',
-          isInput: true,
-          arguments: [],
           serviceId: 1,
+          actionType: 'TIME_IS_X',
+          description: 'This action is triggered when the time is arguments[0]',
+          isInput: true,
+          arguments: ['15:59'],
         },
       },
     },

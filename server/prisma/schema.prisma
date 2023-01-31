@@ -11,7 +11,8 @@ datasource db {
 }
 
 enum ActionType {
-  EVEN_MINUTE
+  TIME_IS_X
+  TIME_IS_X_IN_Y
 }
 
 model Account {
@@ -25,16 +26,15 @@ model Account {
 }
 
 model Brick {
-  id        Int      @id @default(autoincrement())
-  title     String
-  published Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  account   Account  @relation(fields: [accountId], references: [id])
-  accountId Int
-  service   Service  @relation(fields: [serviceId], references: [id])
-  serviceId Int
-  action    Action[]
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  account     Account  @relation(fields: [accountId], references: [id])
+  accountId   Int
+  action      Action[]
 }
 
 model Action {
@@ -61,6 +61,5 @@ model Service {
   serviceToken        String
   serviceRefreshToken String
   logo                String
-  brick               Brick[]
   action              Action[]
 }

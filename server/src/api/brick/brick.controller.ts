@@ -33,8 +33,7 @@ export class BrickController {
       brick: {
         value: {
           title: 'This is a title',
-          // description: 'This is a description',
-          serviceId: 1,
+          description: 'This is a description',
           published: true,
         },
       },

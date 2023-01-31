@@ -19,10 +19,9 @@ export class BrickService {
     return this.prisma.brick.create({
       data: {
         title: brick.title,
-        // description: brick.description,
+        description: brick.description,
         accountId: accountId,
-        serviceId: brick.serviceId,
-        published: true,
+        published: false,
       },
     });
   }
