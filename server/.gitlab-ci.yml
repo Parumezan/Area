@@ -72,6 +72,7 @@ build:
     - <<: *build_cache
       policy: push
   script:
+    - npx prisma generate
     - npm run build
   except:
     - tags
