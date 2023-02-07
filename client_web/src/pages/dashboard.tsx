@@ -6,14 +6,21 @@ import { PlusCircleIcon } from "@heroicons/react/20/solid";
 import type { BrickProps } from "@/types/type";
 import Popup from "@/components/Popup";
 
+interface Brick {
+  id: number;
+  title: string;
+  description: string;
+  published: boolean;
+}
+
 export default function Dashboard() {
   const router = useRouter();
-  const [bricks, setBricks] = useState<BrickProps[]>([]); // state to store the existing bricks
+  const [bricks, setBricks] = useState<Brick[]>([]); // state to store the existing bricks
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showCreatePopup, setShowCreatePopup] = useState(false);
-  const [selectedBrick, setSelectedBrick] = useState<BrickProps>();
+  const [selectedBrick, setSelectedBrick] = useState<Brick>();
 
-  async function createBrick(brick: BrickProps) {
+  async function createBrick(brick: Brick) {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACK_URL}/api/brick`,
       {
@@ -21,7 +28,7 @@ export default function Dashboard() {
         body: JSON.stringify({
           title: brick.title,
           description: brick.description,
-          active: false,
+          published: false,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -35,13 +42,13 @@ export default function Dashboard() {
     }
   }
 
-  async function editBrick(brick: BrickProps) {
+  async function editBrick(brick: Brick) {
     fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/brick/${brick.id}`, {
       method: "PATCH",
       body: JSON.stringify({
         title: brick.title,
         description: brick.description,
-        active: brick.active,
+        published: brick.published,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -94,41 +101,41 @@ export default function Dashboard() {
         <div className="flex flex-row">
           <div className="w-full">
             <div className="flex flex-wrap">
-              {bricks.length &&
-                bricks.map((brick: BrickProps, id: number) => (
-                  <div key={id} className="w-1/4 p-2">
-                    <div className="bg-purple-500 rounded-lg p-2">
-                      <h2
-                        className="text-white cursor-pointer"
-                        onClick={() => accessBrick(id)}
-                      >
-                        {brick.title}
-                      </h2>
-                      <p className="text-white">{brick.description}</p>
-                      <button
-                        className="bg-white text-black px-4 py-2 ml-auto mr-2 mt-auto mb-auto rounded-full"
-                        onClick={() => {
-                          setSelectedBrick({
-                            ...brick,
-                            active: !brick.active,
-                          });
-                          editBrick(selectedBrick);
-                        }}
-                      >
-                        {selectedBrick.active ? "Active" : "Inactive"}
-                      </button>
-                      <button
-                        className="bg-white text-black px-4 py-2 ml-auto mr-2 mt-auto mb-auto rounded-full"
-                        onClick={() => {
-                          setSelectedBrick(brick);
-                          setShowEditPopup(true);
-                        }}
-                      >
-                        Edit
-                      </button>
-                    </div>
+              {bricks.map((brick: Brick, index: number) => (
+                <div key={index} className="w-1/4 p-2">
+                  <div className="bg-purple-500 rounded-lg p-2">
+                    <h2
+                      className="text-white cursor-pointer"
+                      onClick={() => accessBrick(index)}
+                    >
+                      {brick.title}
+                    </h2>
+                    <p className="text-white">{brick.description}</p>
+                    <button
+                      className="bg-white text-black px-4 py-2 ml-auto mr-2 mt-auto mb-auto rounded-full"
+                      onClick={() => {
+                        // setBrickActive(!brick.published);
+                        setSelectedBrick({
+                          ...brick,
+                          published: !brick.published,
+                        });
+                        editBrick(brick);
+                      }}
+                    >
+                      {brick.published ? "Active" : "Inactive"}
+                    </button>
+                    <button
+                      className="bg-white text-black px-4 py-2 ml-auto mr-2 mt-auto mb-auto rounded-full"
+                      onClick={() => {
+                        setSelectedBrick(brick);
+                        setShowEditPopup(true);
+                      }}
+                    >
+                      Edit
+                    </button>
                   </div>
-                ))}
+                </div>
+              ))}
               <div className="w-1/4 p-2">
                 <div
                   className="bg-purple-500 rounded-lg p-2 cursor-pointer"
@@ -147,6 +154,7 @@ export default function Dashboard() {
                 <input
                   type="text"
                   className="bg-purple-200 rounded-lg p-2"
+                  value={selectedBrick.title}
                   onChange={(e) => {
                     setSelectedBrick({
                       ...selectedBrick,
@@ -160,6 +168,7 @@ export default function Dashboard() {
                 <input
                   type="text"
                   className="bg-purple-200 rounded-lg p-2"
+                  value={selectedBrick.description}
                   onChange={(e) =>
                     setSelectedBrick({
                       ...selectedBrick,

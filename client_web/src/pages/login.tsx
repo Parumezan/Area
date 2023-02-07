@@ -25,7 +25,7 @@ export default function Login() {
 
       <div className="h-screen w-screen bg-gray-backlogin">
         <div className="flex h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-          <div className="space-y-20 z-10">
+          <div className="space-y-20">
             <div className="flex flex-row justify-center">
               <div className="my-auto pr-5">
                 <Image
