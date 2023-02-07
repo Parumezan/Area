@@ -12,20 +12,11 @@ export default function Register() {
         <link rel="icon" href="/icon.ico" />
       </Head>
 
-      <div className="bg-gray-backlogin">
-        <div className="fixed bottom-[-1px] resize-none">
-          <Image
-            src="/assets/waves.png"
-            alt="waves"
-            width="1920"
-            height="278"
-          />
-        </div>
-      </div>
+      <div className="absolute w-screen h-screen bg-[url('/assets/waves.png')] bg-contain bg-no-repeat bg-bottom"></div>
 
       <div className="h-screen w-screen bg-gray-backlogin">
         <div className="flex h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-          <div className="space-y-20">
+          <div className="space-y-20 z-10 w-1/3">
             <div className="flex flex-row justify-center">
               <div className="my-auto pr-5">
                 <Image

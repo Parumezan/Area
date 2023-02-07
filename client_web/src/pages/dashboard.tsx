@@ -5,22 +5,23 @@ import { PlusCircleIcon } from "@heroicons/react/20/solid";
 
 import type { BrickProps } from "@/types/type";
 import Popup from "@/components/Popup";
-
-interface Brick {
-  id: number;
-  title: string;
-  description: string;
-  published: boolean;
-}
+import Container from "@/components/Container";
+import Button from "@/components/Button";
 
 export default function Dashboard() {
   const router = useRouter();
-  const [bricks, setBricks] = useState<Brick[]>([]); // state to store the existing bricks
+  const [bricks, setBricks] = useState<BrickProps[]>([]); // state to store the existing bricks
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showCreatePopup, setShowCreatePopup] = useState(false);
-  const [selectedBrick, setSelectedBrick] = useState<Brick>();
+  const [selectedBrick, setSelectedBrick] = useState<BrickProps>({
+    id: 0,
+    title: "",
+    description: "",
+    active: false,
+    actions: [],
+  });
 
-  async function createBrick(brick: Brick) {
+  async function createBrick(brick: BrickProps) {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACK_URL}/api/brick`,
       {
@@ -39,16 +40,19 @@ export default function Dashboard() {
     if (response.status === 401 || response.status === 403) {
       router.push("/login");
       window.location.reload();
+    } else {
+      const json = await response.json();
+      setBricks([...bricks, json]);
     }
   }
 
-  async function editBrick(brick: Brick) {
+  function editBrick(brick: BrickProps) {
     fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/brick/${brick.id}`, {
       method: "PATCH",
       body: JSON.stringify({
         title: brick.title,
         description: brick.description,
-        published: brick.published,
+        published: brick.active,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -58,7 +62,6 @@ export default function Dashboard() {
       .then((response) => {
         if (response.status === 401 || response.status === 403) {
           router.push("/login");
-          window.location.reload();
         }
       })
       .then(() => {
@@ -71,8 +74,28 @@ export default function Dashboard() {
       });
   }
 
-  async function accessBrick(id: number) {
-    router.push("/brick/" + id);
+  function destroyBrick(brick: BrickProps) {
+    fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/brick/${brick.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 401 || response.status === 403) {
+          router.push("/login");
+          window.location.reload();
+        }
+      })
+      .then(() => {
+        // remove the brick with the id of brick.id
+        const idx = bricks.findIndex((b) => b.id === brick.id);
+        setBricks([...bricks.slice(0, idx), ...bricks.slice(idx + 1)]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   async function fetchData() {
@@ -96,164 +119,163 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="overflow-x-hidden">
-      <DefaultWrapper>
-        <div className="flex flex-row">
-          <div className="w-full">
-            <div className="flex flex-wrap">
-              {bricks.map((brick: Brick, index: number) => (
-                <div key={index} className="w-1/4 p-2">
-                  <div className="bg-purple-500 rounded-lg p-2">
-                    <h2
-                      className="text-white cursor-pointer"
-                      onClick={() => accessBrick(index)}
+    <DefaultWrapper>
+      <div className="w-full h-full flex flex-row">
+        <div className="w-full h-full flex flex-col justify-between">
+          <div className="w-full h-full grid grid-cols-4 grid-flow-row-dense p-4 gap-4">
+            {bricks.length &&
+              bricks.map((brick: BrickProps, index: number) => (
+                <Container key={index}>
+                  <div className="flex flex-col justify-around space-y-5 w-full max-h-[150px] h-[150px]">
+                    <div
+                      className="flex flex-col w-full h-full cursor-pointer"
+                      onClick={() => router.push(`/brick/${index}`)}
                     >
-                      {brick.title}
-                    </h2>
-                    <p className="text-white">{brick.description}</p>
-                    <button
-                      className="bg-white text-black px-4 py-2 ml-auto mr-2 mt-auto mb-auto rounded-full"
-                      onClick={() => {
-                        // setBrickActive(!brick.published);
-                        setSelectedBrick({
-                          ...brick,
-                          published: !brick.published,
-                        });
-                        editBrick(brick);
-                      }}
-                    >
-                      {brick.published ? "Active" : "Inactive"}
-                    </button>
-                    <button
-                      className="bg-white text-black px-4 py-2 ml-auto mr-2 mt-auto mb-auto rounded-full"
-                      onClick={() => {
-                        setSelectedBrick(brick);
-                        setShowEditPopup(true);
-                      }}
-                    >
-                      Edit
-                    </button>
+                      <h2 className="text-white truncate">{brick.title}</h2>
+                      <p className="h-full text-white truncate">
+                        {brick.description}
+                      </p>
+                    </div>
+                    <div className="flex flex-row space-x-5">
+                      <Button
+                        onClick={() => {
+                          editBrick({ ...brick, active: !brick.active });
+                        }}
+                      >
+                        {brick.active ? "Active" : "Inactive"}
+                      </Button>
+
+                      <Button
+                        onClick={() => {
+                          setSelectedBrick(brick);
+                          setShowEditPopup(true);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                </Container>
               ))}
-              <div className="w-1/4 p-2">
+          </div>
+
+          <div className="w-full h-full p-4 flex flex-row justify-center">
+            <div className="w-1/3">
+              <Container>
                 <div
-                  className="bg-purple-500 rounded-lg p-2 cursor-pointer"
-                  onClick={() => setShowCreatePopup(true)}
+                  className="w-full h-full rounded-lg p-2 cursor-pointer"
+                  onClick={() => {
+                    setSelectedBrick({
+                      id: 0,
+                      title: "",
+                      description: "",
+                      active: false,
+                      actions: [],
+                    });
+                    setShowCreatePopup(true);
+                  }}
                 >
-                  <PlusCircleIcon className="w-auto h-auto m-auto fill-white" />
+                  <PlusCircleIcon className="w-16 h-16 m-auto fill-white" />
                 </div>
-              </div>
+              </Container>
             </div>
           </div>
-          {showCreatePopup && (
-            <Popup>
-              <h2 className="text-white text-center mb-4">Create Brick</h2>
-              <div className="my-4">
-                <label className="text-white">Name:</label>
-                <input
-                  type="text"
-                  className="bg-purple-200 rounded-lg p-2"
-                  value={selectedBrick.title}
-                  onChange={(e) => {
-                    setSelectedBrick({
-                      ...selectedBrick,
-                      title: e.target.value,
-                    });
-                  }}
-                />
-              </div>
-              <div className="my-4">
-                <label className="text-white">Description:</label>
-                <input
-                  type="text"
-                  className="bg-purple-200 rounded-lg p-2"
-                  value={selectedBrick.description}
-                  onChange={(e) =>
-                    setSelectedBrick({
-                      ...selectedBrick,
-                      description: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className="flex justify-around">
-                <button
-                  className="bg-white text-black px-4 py-2 ml-auto mr-2 mt-auto mb-auto rounded-full"
-                  onClick={() => setShowCreatePopup(false)}
-                >
+        </div>
+        {showCreatePopup && (
+          <Popup>
+            <div className="flex flex-col space-y-8">
+              <h2 className="text-white text-center">Create a brick</h2>
+              <input
+                placeholder="Name"
+                type="text"
+                className="bg-black text-white rounded-lg p-2"
+                value={selectedBrick.title}
+                onChange={(e) => {
+                  setSelectedBrick({
+                    ...selectedBrick,
+                    title: e.target.value,
+                  });
+                }}
+              />
+              <input
+                placeholder="Description"
+                type="text"
+                className="bg-black text-white rounded-lg p-2"
+                value={selectedBrick.description}
+                onChange={(e) =>
+                  setSelectedBrick({
+                    ...selectedBrick,
+                    description: e.target.value,
+                  })
+                }
+              />
+              <div className="w-full flex flex-row justify-between">
+                <Button onClick={() => setShowCreatePopup(false)}>
                   Cancel
-                </button>
-                <button
-                  className="bg-white text-black px-4 py-2 ml-auto mr-2 mt-auto mb-auto rounded-full"
+                </Button>
+                <Button
                   onClick={() => {
                     setShowCreatePopup(false);
                     createBrick(selectedBrick);
                   }}
                 >
                   Create
-                </button>
+                </Button>
               </div>
-            </Popup>
-          )}
-          {showEditPopup && (
-            <Popup>
-              <h2 className="text-white text-center mb-4">Edit Brick</h2>
-              <div className="my-4">
-                <label className="text-white">Name:</label>
-                <input
-                  type="text"
-                  className="bg-purple-200 rounded-lg p-2"
-                  value={selectedBrick.title}
-                  onChange={(e) =>
-                    setSelectedBrick({
-                      ...selectedBrick,
-                      title: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className="my-4">
-                <label className="text-white">Description:</label>
-                <input
-                  type="text"
-                  className="bg-purple-200 rounded-lg p-2"
-                  value={selectedBrick.description}
-                  onChange={(e) =>
-                    setSelectedBrick({
-                      ...selectedBrick,
-                      description: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className="flex justify-around">
-                <button
-                  className="bg-white text-black px-4 py-2 ml-auto mr-2 mt-auto mb-auto rounded-full"
-                  onClick={() => setShowEditPopup(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="bg-white text-black px-4 py-2 ml-auto mr-2 mt-auto mb-auto rounded-full"
-                  onClick={() => setShowEditPopup(false)}
+            </div>
+          </Popup>
+        )}
+        {showEditPopup && (
+          <Popup>
+            <div className="flex flex-col space-y-8">
+              <h2 className="text-white text-center">Edit a brick</h2>
+              <input
+                placeholder="Name"
+                type="text"
+                className="bg-black text-white rounded-lg p-2"
+                value={selectedBrick.title}
+                onChange={(e) =>
+                  setSelectedBrick({
+                    ...selectedBrick,
+                    title: e.target.value,
+                  })
+                }
+              />
+              <input
+                placeholder="Description"
+                type="text"
+                className="bg-black text-white rounded-lg p-2"
+                value={selectedBrick.description}
+                onChange={(e) =>
+                  setSelectedBrick({
+                    ...selectedBrick,
+                    description: e.target.value,
+                  })
+                }
+              />
+              <div className="w-full flex flex-row justify-between">
+                <Button onClick={() => setShowEditPopup(false)}>Cancel</Button>
+                <Button
+                  onClick={() => {
+                    destroyBrick(selectedBrick);
+                    setShowEditPopup(false);
+                  }}
                 >
                   Destroy
-                </button>
-                <button
-                  className="bg-white text-black px-4 py-2 ml-auto mr-2 mt-auto mb-auto rounded-full"
+                </Button>
+                <Button
                   onClick={() => {
                     setShowEditPopup(false);
                     editBrick(selectedBrick);
                   }}
                 >
                   Validate
-                </button>
+                </Button>
               </div>
-            </Popup>
-          )}
-        </div>
-      </DefaultWrapper>
-    </div>
+            </div>
+          </Popup>
+        )}
+      </div>
+    </DefaultWrapper>
   );
 }

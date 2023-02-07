@@ -25,4 +25,3 @@ COPY . .
 RUN npm install
 
 ENTRYPOINT [ "docker-entrypoint" ]
-CMD ["npm", "run", "dev"]

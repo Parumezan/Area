@@ -4,6 +4,5 @@ services:
     container_name: client_web_dev
     ports:
       - ${FRONT_PORT}:${FRONT_PORT}
-    environment:
-      NODE_ENV: development
-      NEXT_PUBLIC_BACK_URL: ${NEXT_PUBLIC_BACK_URL}
+    env_file:
+      - .env

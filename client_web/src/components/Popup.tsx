@@ -1,15 +1,17 @@
+import Container from "./Container";
+
 interface PropsType {
   children: React.ReactNode;
 }
 
 export default function Popup(props: PropsType) {
   return (
-    <>
-      <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75">
-        <div className="bg-purple-500 rounded-lg p-4 m-auto w-1/2">
-          <main className="flex-1">{props.children}</main>
-        </div>
+    <div className="fixed w-full h-full flex flex-col justify-center bg-black bg-opacity-75">
+      <div className="w-1/4 mx-auto">
+        <Container>
+          <div className="w-full h-full">{props.children}</div>
+        </Container>
       </div>
-    </>
+    </div>
   );
 }

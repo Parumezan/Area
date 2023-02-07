@@ -3,5 +3,6 @@ services:
   client_web:
     container_name: client_web
     environment:
-      NODE_ENV: production
-      NEXT_PUBLIC_BACK_URL: ${NEXT_PUBLIC_BACK_URL}
+      NODE_ENV: Production
+    env_file:
+      - .env

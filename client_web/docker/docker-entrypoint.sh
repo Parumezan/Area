@@ -13,4 +13,4 @@ else
 	npm install --prefer-offline
 fi
 
-exec "$@"
+npm run dev
