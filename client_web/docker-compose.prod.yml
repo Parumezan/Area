@@ -4,4 +4,4 @@ services:
     container_name: client_web
     environment:
       NODE_ENV: production
-      BACK_URL: ${BACK_URL}
+      NEXT_PUBLIC_BACK_URL: ${NEXT_PUBLIC_BACK_URL}

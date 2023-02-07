@@ -31,9 +31,11 @@ module.exports = {
         },
         purple: {
           chart: '#7743DB',
+          header: '#493486',
         },
         beige: {
           chart: '#FFE9B1',
+          header: '#493486',
         },
       },
     },

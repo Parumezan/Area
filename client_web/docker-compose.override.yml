@@ -6,4 +6,4 @@ services:
       - ${FRONT_PORT}:${FRONT_PORT}
     environment:
       NODE_ENV: development
-      BACK_URL: ${BACK_URL}
+      NEXT_PUBLIC_BACK_URL: ${NEXT_PUBLIC_BACK_URL}

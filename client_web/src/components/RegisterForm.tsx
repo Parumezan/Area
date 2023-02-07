@@ -9,18 +9,20 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
 
   async function fetchData(emailData: string, passwordData: string) {
-    const response = await fetch(`${process.env.BACK_URL}/auth/register`, {
-      method: "POST",
-      body: JSON.stringify({
-        email: emailData,
-        passwordHash: passwordData,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACK_URL}/auth/register`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          email: emailData,
+          password: passwordData,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     if (response.status === 401 || response.status === 403) {
-      // eslint-disable-next-line no-alert
       alert("Wrong email or password");
     } else {
       const json = await response.json();
