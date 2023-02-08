@@ -36,11 +36,11 @@ export default function Services() {
 
   return (
     <DefaultWrapper>
-      <div className="grid grid-cols-2 grid-flow-row-dense w-fit bg-indigo-800 border-4 border-indigo-500 rounded-xl m-auto overflow-hidden drop-shadow-lg my-10">
+      <div className="grid grid-cols-2 grid-flow-row-dense w-fit border-4 border-gray-500 rounded-xl m-auto overflow-hidden drop-shadow-lg my-10">
         {services.map((service) => (
           <button
             onClick={() => service.login()}
-            className="p-5 hover:bg-indigo-700"
+            className="p-5 bg-opacity-75 bg-gray-800 hover:bg-opacity-80 transition"
             key={service.name}
           >
             <Image

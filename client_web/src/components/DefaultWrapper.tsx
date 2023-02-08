@@ -27,7 +27,7 @@ export default function DefaultWrapper(props: PropsType) {
         <link rel="icon" href="/assets/logo.png" />
       </Head>
 
-      <div className="absolute w-screen h-screen -z-10 bg-[url('/assets/background.png')] bg-cover"></div>
+      <div className="absolute w-screen h-screen -z-10 bg-[url('/assets/background.png')] bg-contain"></div>
       <Header />
       <main className="flex-1">{props.children}</main>
     </>

@@ -55,7 +55,7 @@ function CallbackPage({ code }) {
         <div className="flex flex-col items-center justify-center h-screen">
           <div className="w-fit">
             <Container>
-              <div className="flex flex-col justify-between space-y-2">
+              <div className="flex flex-col justify-between space-y-2 p-2">
                 <div className="text-white text-3xl">Connexion réussie !</div>
                 <div className="flex flex-row justify-center"></div>
                 <Button onClick={() => router.push("/services")}>Retour</Button>

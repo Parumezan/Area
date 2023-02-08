@@ -31,7 +31,7 @@ export default function Header() {
   }
 
   return (
-    <div className="flex flex-row justify-between w-screen bg-purple-header pr-5">
+    <div className="flex flex-row justify-between w-screen bg-gray-800 bg-opacity-75 backdrop-blur-sm pr-5">
       <div className="flex flex-row space-x-10">
         <Image src="/assets/logo.png" alt="logo" width="90" height="90" />
         {pages.map((page) => (
