@@ -21,7 +21,7 @@ export class BrickService {
         title: brick.title,
         description: brick.description,
         accountId: accountId,
-        published: false,
+        active: false,
       },
     });
   }

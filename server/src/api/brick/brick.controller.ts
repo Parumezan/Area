@@ -34,7 +34,7 @@ export class BrickController {
         value: {
           title: 'This is a title',
           description: 'This is a description',
-          published: true,
+          active: true,
         },
       },
     },

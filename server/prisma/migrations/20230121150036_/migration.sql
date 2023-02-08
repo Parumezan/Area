@@ -13,7 +13,7 @@ CREATE TABLE "Account" (
 CREATE TABLE "Brick" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
-    "published" BOOLEAN NOT NULL DEFAULT false,
+    "active" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "accountId" INTEGER NOT NULL,

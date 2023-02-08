@@ -26,7 +26,7 @@ export class ActionController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('/brick:brickId')
+  @Get('/brick/brickId')
   readActionsFromBrick(@Req() req: any, @Param('brickId') brickId: number) {
     return this.actionService.readActionsFromBrick(req.user.id, brickId);
   }

@@ -8,5 +8,5 @@ export class CreateBrickDto {
   description: string;
 
   @IsBoolean()
-  published: boolean;
+  active: boolean;
 }
