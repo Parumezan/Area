@@ -1,19 +1,34 @@
-import { Controller, Get, UseGuards, Redirect } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import {
+  Controller,
+  Get,
+  Req,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { TwitterService } from './twitter.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('twitter')
 export class TwitterController {
   constructor(private readonly twitterService: TwitterService) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Get()
-  getTwitter(): string {
-    return this.twitterService.getTwitter();
+  @Get('requestToken')
+  async getTwitterToken(): Promise<string> {
+    const url = await this.twitterService.getTwitterToken();
+    return url.oauth_token;
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('/request-token')
-  @Redirect('https://api.twitter.com/oauth/request_token', 302)
-  requestToken() {}
+  @Post('callback')
+  async twitterCallback(@Body() body, @Req() req: any): Promise<String> {
+    const token = await this.twitterService.getTwitterAccessToken(
+      body.oauthToken,
+      body.oauthVerifier,
+    );
+    this.twitterService.addTokenToDatabase(token, req.user.id);
+    return 'Success';
+  }
 }

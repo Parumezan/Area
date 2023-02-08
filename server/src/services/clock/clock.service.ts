@@ -32,30 +32,6 @@ export class ClockService extends BaseService {
       });
   }
 
-  execAllFromAction(action: Action) {
-    this.prisma.brick
-      .findUnique({
-        where: {
-          id: action.brickId,
-        },
-      })
-      .then((brick) => {
-        this.prisma.action
-          .findMany({
-            where: {
-              brickId: brick.id,
-              isInput: false,
-            },
-          })
-          .then((actions) => {
-            actions.forEach((action) => {
-              if (action.isInput === false)
-                console.log('trigger action', action.description);
-            });
-          });
-      });
-  }
-
   async action_TIME_IS_X(action: Action) {
     if (action.arguments.length === 0) return;
     const time = action.arguments[0];

@@ -34,6 +34,7 @@ export class AuthService {
     if (!DBuser) {
       throw new HttpException('Forbidden', 403);
     }
+    console.log('login == ' + DBuser.id);
     return {
       access_token: this.jwtService.sign({
         id: DBuser.id,

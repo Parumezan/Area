@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "ActionType" ADD VALUE 'POST_TWEET_FROM_BOT';

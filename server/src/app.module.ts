@@ -9,6 +9,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { BrickModule } from './api/brick/brick.module';
 import { ActionModule } from './api/action/action.module';
 import { BaseModule } from './services/base/base.module';
+import { PrismaProvider } from './prisma';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { BaseModule } from './services/base/base.module';
     ActionModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaProvider],
 })
 export class AppModule {}
