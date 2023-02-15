@@ -29,7 +29,7 @@ export default function Dashboard() {
         body: JSON.stringify({
           title: brick.title,
           description: brick.description,
-          published: false,
+          active: false,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +52,7 @@ export default function Dashboard() {
       body: JSON.stringify({
         title: brick.title,
         description: brick.description,
-        published: brick.active,
+        active: brick.active,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -116,7 +116,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [router]);
 
   return (
     <DefaultWrapper>
@@ -129,7 +129,7 @@ export default function Dashboard() {
                   <div className="flex flex-col justify-around space-y-5 w-full max-h-[150px] h-[150px]">
                     <div
                       className="flex flex-col w-full h-full cursor-pointer"
-                      onClick={() => router.push(`/brick/${index}`)}
+                      onClick={() => router.push(`/brick/${brick.id}`)}
                     >
                       <h2 className="text-white truncate">{brick.title}</h2>
                       <p className="h-full text-white truncate">

@@ -13,6 +13,7 @@ export interface ServiceProps {
 }
 
 export interface ActionProps {
+  id: number;
   service: ServiceProps;
   description: string;
   isReaction: boolean;
