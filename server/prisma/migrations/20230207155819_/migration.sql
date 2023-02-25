@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "ActionType" ADD VALUE 'GET_EMAIL_FROM_USER';

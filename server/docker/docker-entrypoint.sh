@@ -5,12 +5,14 @@ if [ "${1#-}" != "${1}" ] || [ -z "$(command -v "${1}")" ] || { [ -f "${1}" ] &&
 	set -- node "$@"
 fi
 
-npm rebuild esbuild
+# npm rebuild esbuild
+npm i -g prisma
+npm i --prefer-offline
 
-if [ "$APP_ENV" == 'prod' ]; then
-	npm install --production
-else
-	npm install --prefer-offline
-fi
+# # update db
+prisma migrate deploy
+prisma generate
+
+npm run start:dev
 
 exec "$@"

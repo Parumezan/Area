@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "ActionType" ADD VALUE 'SEND_WHISPERS_TWITCH';

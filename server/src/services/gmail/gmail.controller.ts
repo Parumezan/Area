@@ -6,17 +6,17 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ClockService } from './clock.service';
+import { GmailService } from './gmail.service';
 
-@ApiTags('Clock')
-@Controller('clock')
-export class ClockController {
-  constructor(private readonly clockService: ClockService) {}
+@ApiTags('Gmail')
+@Controller('gmail')
+export class GmailController {
+  constructor(private readonly gmailService: GmailService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
   @ApiOperation({
-    summary: 'Get clock',
+    summary: 'Get gmail',
     description: 'Get the current time.',
   })
   @ApiBearerAuth()
@@ -24,13 +24,13 @@ export class ClockController {
     schema: {
       type: 'object',
       properties: {
-        clock: {
+        gmail: {
           type: 'string',
         },
       },
     },
   })
-  getClock(): string {
-    return this.clockService.getClock();
+  getGmail(): string {
+    return this.gmailService.getGmail();
   }
 }
