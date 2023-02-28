@@ -30,34 +30,9 @@ export class TwitchController {
       },
     },
   })
-  async twitterCallback(@Body() body, @Req() req: any): Promise<string> {
-    const tokens = await this.twitchService.getTwitterAccessToken(body.code);
-    console.log(tokens);
+  async twitchCallback(@Body() body, @Req() req): Promise<string> {
+    const tokens = await this.twitchService.getTwitchAccessToken(body.code);
     this.twitchService.addTokenToDatabase(tokens, req.user.id);
     return 'Success';
-  }
-
-  @Post('testMessage')
-  @ApiOperation({
-    summary: 'Test message',
-    description: 'Test message',
-  })
-  @ApiResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        access_token: {
-          type: 'string',
-        },
-      },
-    },
-  })
-  async testMessage(): Promise<string> {
-    const result = await this.twitchService.testMessage(
-      'f93qaj7laornw86mss1c4fx36negr1',
-      'pichade5',
-      'Bonjour bot pierre',
-    );
-    return result.toString();
   }
 }

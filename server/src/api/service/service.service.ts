@@ -8,11 +8,24 @@ export class ServiceService {
   constructor(@Inject('Prisma') private readonly prisma: PrismaClient) {}
 
   async readAllServices(accountId: number): Promise<Service[]> {
-    return this.prisma.service.findMany({
+    const services = await this.prisma.service.findMany({
       where: {
         accountId: accountId,
       },
     });
+    services.push({
+      id: -1,
+      title: 'Time',
+    } as Service);
+    services.push({
+      id: -2,
+      title: 'Crypto',
+    } as Service);
+    services.push({
+      id: -3,
+      title: 'Meteo',
+    } as Service);
+    return services;
   }
 
   async createService(

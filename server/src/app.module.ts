@@ -11,6 +11,10 @@ import { BaseModule } from './services/base/base.module';
 import { PrismaProvider } from './prisma';
 import { ServiceModule } from './api/service/service.module';
 import { TwitchModule } from './services/twitch/twitch.module';
+import { WeatherModule } from './services/weather/weather.module';
+import { CryptoModule } from './services/crypto/crypto.module';
+import { LinkerModule } from './linker/linker.module';
+import { onePieceModule } from './services/onePiece/onePiece.module';
 
 @Module({
   imports: [
@@ -23,6 +27,10 @@ import { TwitchModule } from './services/twitch/twitch.module';
     ActionModule,
     ServiceModule,
     TwitchModule,
+    WeatherModule,
+    CryptoModule,
+    LinkerModule,
+    onePieceModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaProvider],

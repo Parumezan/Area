@@ -8,16 +8,20 @@ import { Action, ActionType } from '@prisma/client';
 export class TwitchService extends BaseService {
   private twitchApiUrl = 'https://api.twitch.tv/helix';
 
-  async getTwitterAccessToken(code: string) {
-    const response = await axios.post('https://id.twitch.tv/oauth2/token', {
-      client_id: process.env.TWITCH_CLIENT_ID,
-      client_secret: process.env.TWITCH_CLIENT_SECRET,
-      code: code,
-      grant_type: 'authorization_code',
-      redirect_uri: process.env.TWITCH_CALLBACK_URL,
-    });
-    const tokens = response.data;
-    return tokens;
+  async getTwitchAccessToken(code: string) {
+    try {
+      const response = await axios.post('https://id.twitch.tv/oauth2/token', {
+        client_id: process.env.TWITCH_CLIENT_ID,
+        client_secret: process.env.TWITCH_CLIENT_SECRET,
+        code: code,
+        grant_type: 'authorization_code',
+        redirect_uri: process.env.TWITCH_CALLBACK_URL,
+      });
+      const tokens = response.data;
+      return tokens;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   @Cron(CronExpression.EVERY_10_SECONDS)
@@ -25,7 +29,9 @@ export class TwitchService extends BaseService {
     this.prisma.action
       .findMany({
         where: {
-          serviceId: 2,
+          service: {
+            title: 'Twitch',
+          },
         },
       })
       .then((actions: Action[]) => {
@@ -40,6 +46,12 @@ export class TwitchService extends BaseService {
                 break;
               case ActionType.UNBLOCK_USER_TWITCH:
                 this.action_UNBLOCK_USER(action);
+                break;
+              case ActionType.DETECT_STREAMERS_PLAY_GAMES_TWITCH:
+                this.action_DETECT_STREAMERS_PLAY_GAMES(action);
+                break;
+              case ActionType.DETECT_USER_STREAM_GAMES_TWITCH:
+                this.action_DETECT_USER_STREAM_GAMES(action);
                 break;
             }
         });
@@ -124,6 +136,33 @@ export class TwitchService extends BaseService {
     }
   }
 
+  async getIdByNameGame(gameName: string, authToken: string) {
+    const apiUrl = `${this.twitchApiUrl}/games`;
+    const headers = {
+      'Client-ID': process.env.TWITCH_CLIENT_ID,
+      Authorization: `Bearer ${authToken}`,
+    };
+    const params = {
+      name: gameName,
+    };
+    const options: AxiosRequestConfig = {
+      method: 'GET',
+      url: apiUrl,
+      headers: headers,
+      params: params,
+    };
+    try {
+      const response = await axios(options);
+      if (response.data.data.length == 0) return -1;
+      const game = response.data.data[0];
+      const gameId = game.id;
+      return gameId;
+    } catch (error) {
+      console.log('Error getting game ID:', error.response.data);
+      return -1;
+    }
+  }
+
   async action_SEND_MESSAGE(action: Action) {
     const service = await this.prisma.service.findFirst({
       where: {
@@ -175,37 +214,27 @@ export class TwitchService extends BaseService {
         id: action.serviceId,
       },
     });
-    const username = action.arguments[0];
     const headers = {
       'Client-ID': process.env.TWITCH_CLIENT_ID,
       Authorization: `Bearer ${service.serviceToken}`,
     };
-    let data = {};
-    try {
-      data = {
-        target_user_id: await this.getUserId(username, service.serviceToken),
+    for (let i = 0; i < action.arguments.length; i++) {
+      const options: AxiosRequestConfig = {
+        method: 'PUT',
+        url: `${this.twitchApiUrl}/users/blocks`,
+        headers: headers,
+        data: { target_user_id: action.arguments[i] },
       };
-    } catch (error) {
-      console.log('Error getting user ID:', error.response.data);
-      throw new Error('Error getting user ID');
-    }
-    const options: AxiosRequestConfig = {
-      method: 'PUT',
-      url: `${this.twitchApiUrl}/users/blocks`,
-      headers: headers,
-      data: data,
-    };
-    try {
-      const response = await axios(options);
-      if (response.status === 204) {
-        console.log('Request was successful!');
-      } else {
-        console.log(`Request failed with status code: ${response.status}`);
+      try {
+        const response = await axios(options);
+        if (response.status === 204) {
+          console.log('Request was successful!');
+        } else {
+          console.log(`Request failed with status code: ${response.status}`);
+        }
+      } catch (error) {
+        console.log('Error unblocking user:', error.response.data);
       }
-      return response.status;
-    } catch (error) {
-      console.log('Error blocking user:', error.response.data);
-      throw new Error('Error blocking user');
     }
   }
 
@@ -215,48 +244,42 @@ export class TwitchService extends BaseService {
         id: action.serviceId,
       },
     });
-    const username = action.arguments[0];
     const headers = {
       'Client-ID': process.env.TWITCH_CLIENT_ID,
       Authorization: `Bearer ${service.serviceToken}`,
     };
-    let data = {};
-    try {
-      data = {
-        target_user_id: await this.getUserId(username, service.serviceToken),
+    for (let i = 0; i < action.arguments.length; i++) {
+      const options: AxiosRequestConfig = {
+        method: 'DELETE',
+        url: `${this.twitchApiUrl}/users/blocks`,
+        headers: headers,
+        data: { target_user_id: action.arguments[i] },
       };
-    } catch (error) {
-      console.log('Error getting user ID:', error.response.data);
-      throw new Error('Error getting user ID');
-    }
-    const options: AxiosRequestConfig = {
-      method: 'DELETE',
-      url: `${this.twitchApiUrl}/users/blocks`,
-      headers: headers,
-      data: data,
-    };
-    try {
-      const response = await axios(options);
-      if (response.status === 204) {
-        console.log('Request was successful!');
-      } else {
-        console.log(`Request failed with status code: ${response.status}`);
+      try {
+        const response = await axios(options);
+        if (response.status === 204) {
+          console.log('Request was successful!');
+        } else {
+          console.log(`Request failed with status code: ${response.status}`);
+        }
+      } catch (error) {
+        console.log('Error unblocking user:', error.response.data);
       }
-      return response.status;
-    } catch (error) {
-      console.log('Error unblocking user:', error.response.data);
-      throw new Error('Error unblocking user');
     }
   }
 
-  async action_DETECT_STREAM(action: Action) {
+  async action_DETECT_USER_STREAM_GAMES(action: Action) {
     const service = await this.prisma.service.findFirst({
       where: {
         id: action.serviceId,
       },
     });
     const username = action.arguments[0];
-    const game = action.arguments[1];
+    const game = await this.getIdByNameGame(
+      action.arguments[1],
+      service.serviceToken,
+    );
+    if (game == -1) return false;
     const headers = {
       'Client-ID': process.env.TWITCH_CLIENT_ID,
       Authorization: `Bearer ${service.serviceToken}`,
@@ -279,8 +302,7 @@ export class TwitchService extends BaseService {
       }
       if (
         response.data.data.length > 0 &&
-        game &&
-        response.data.data[0].game_name === game
+        response.data.data[0].game_id === game
       ) {
         return true;
       } else {
@@ -292,42 +314,41 @@ export class TwitchService extends BaseService {
     }
   }
 
-  async testMessage(token: string, username: string, message: string) {
+  async action_DETECT_STREAMERS_PLAY_GAMES(action: Action) {
+    const service = await this.prisma.service.findFirst({
+      where: {
+        id: action.serviceId,
+      },
+    });
+    const game = await this.getIdByNameGame(
+      action.arguments[0],
+      service.serviceToken,
+    );
+    if (game === -1) throw new Error('Game not found');
     const headers = {
       'Client-ID': process.env.TWITCH_CLIENT_ID,
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${service.serviceToken}`,
     };
-    let data = {};
-    try {
-      data = {
-        from_user_id: await this.getAuthenticatedUserId(token),
-        to_user_id: await this.getUserId(username, token),
-      };
-    } catch (error) {
-      console.log('Error getting authenticated user ID:', error.response.data);
-      throw new Error('Error getting authenticated user ID');
-    }
-    console.log(data);
+    const params = {
+      game_id: game,
+    };
     const options: AxiosRequestConfig = {
-      method: 'POST',
-      url: `${this.twitchApiUrl}/whispers`,
+      method: 'GET',
+      url: `${this.twitchApiUrl}/streams`,
       headers: headers,
-      params: {
-        message: message,
-      },
-      data: data,
+      params: params,
     };
     try {
       const response = await axios(options);
-      if (response.status === 204) {
+      if (response.status === 200) {
         console.log('Request was successful!');
+        return response.data.data.map((stream) => stream.user_name);
       } else {
         console.log(`Request failed with status code: ${response.status}`);
       }
-      return response.status;
     } catch (error) {
-      console.log('Error whisper user:', error.response.data);
-      throw new Error('Error whisper user');
+      console.log('Error detecting stream:', error.response.data);
+      throw new Error('Error detecting stream');
     }
   }
 }

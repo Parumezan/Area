@@ -33,13 +33,21 @@ export class TwitterService extends BaseService {
 
   @Cron(CronExpression.EVERY_10_SECONDS)
   handleCron() {
-    this.prisma.action
+    this.prisma.service
       .findMany({
         where: {
-          serviceId: 2,
+          title: 'Twitter',
+        },
+        include: {
+          action: {
+            where: {
+              isInput: true,
+            },
+          },
         },
       })
-      .then((actions: Action[]) => {
+      .then((services) => {
+        const actions = services.flatMap((service) => service.action);
         actions.forEach((action: Action) => {
           if (action.isInput === true)
             switch (action.actionType) {
@@ -48,6 +56,15 @@ export class TwitterService extends BaseService {
                 break;
               case ActionType.POST_TWEET_FROM_BOT:
                 this.action_POST_TWEET(action);
+                break;
+              case ActionType.LIKE_TWEET:
+                this.action_LIKE_TWEET(action);
+                break;
+              case ActionType.RETWEET_TWEET:
+                this.action_RETWEET_TWEET(action);
+                break;
+              case ActionType.COMMENT_TWEET:
+                this.action_COMMENT_TWEET(action);
                 break;
             }
         });
@@ -84,7 +101,7 @@ export class TwitterService extends BaseService {
   }
 
   async getTwitterToken() {
-    var requestToken: TwitterRequestToken;
+    let requestToken: TwitterRequestToken;
     try {
       requestToken = await new Promise((resolve, reject) => {
         this.oAuthClient.getOAuthRequestToken(
@@ -95,8 +112,7 @@ export class TwitterService extends BaseService {
             oauth_callback_confirmed: boolean,
           ) => {
             if (error) {
-              console.log(error);
-              reject(error);
+              console.log('Error getting OAuth request token : ' + error);
             } else
               resolve({
                 oauth_token,
@@ -150,19 +166,21 @@ export class TwitterService extends BaseService {
       },
     });
     const client = new Twit({
-      appKey: env.TWITTER_CONSUMER_KEY,
-      appSecret: env.TWITTER_CONSUMER_SECRET,
-      accessToken: service.serviceToken,
-      accessSecret: service.serviceTokenSecret,
+      consumer_key: env.TWITTER_CONSUMER_KEY,
+      consumer_secret: env.TWITTER_CONSUMER_SECRET,
+      access_token: service.serviceToken,
+      access_token_secret: service.serviceTokenSecret,
     });
-    const tweet = await client.v1.get('statuses/user_timeline', {
+    const tweet = await client.get('statuses/user_timeline', {
       screen_name: action.arguments[0],
       count: 1,
     });
-    return tweet;
+    return tweet.data[0]?.text;
   }
 
   async action_POST_TWEET(action: Action) {
+    if (action.arguments.length < 1) return;
+    console.log(action.arguments[0]);
     const service = await this.prisma.service.findFirst({
       where: {
         id: action.serviceId,
@@ -186,6 +204,14 @@ export class TwitterService extends BaseService {
         }
       },
     );
+    await this.prisma.action.update({
+      where: {
+        id: action.id,
+      },
+      data: {
+        actionType: ActionType.NULL,
+      },
+    });
   }
 
   async action_LIKE_TWEET(action: Action) {

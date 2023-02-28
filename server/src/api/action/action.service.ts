@@ -45,6 +45,20 @@ export class ActionService {
     const brick = await this.prisma.brick.findUnique({
       where: { id: action.brickId },
     });
+    let serviceId;
+    if (action.serviceName == 'Time') {
+      serviceId = -1;
+    } else if (action.serviceName == 'Meteo') {
+      serviceId = -2;
+    } else if (action.serviceName == 'Crypto') {
+      serviceId = -3;
+    } else {
+      const service = await this.prisma.service.findFirst({
+        where: { accountId: accountId, title: action.serviceName },
+      });
+      serviceId = service.id;
+    }
+
     if (!brick) throw new HttpException('Forbidden', 403);
     if (brick.accountId !== accountId)
       throw new HttpException('Forbidden', 403);
@@ -52,7 +66,7 @@ export class ActionService {
       data: {
         description: action.description,
         brickId: action.brickId,
-        serviceId: action.serviceId,
+        serviceId: serviceId,
         arguments: action.arguments,
         isInput: action.isInput,
         actionType: action.actionType,

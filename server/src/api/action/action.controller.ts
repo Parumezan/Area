@@ -39,7 +39,7 @@ export class ActionController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('/brick/brickId')
+  @Get('/brick/:brickId')
   @ApiOperation({
     summary: "Get all user's actions from a brick",
     description: "Returns an array of all user's actions from a brick.",

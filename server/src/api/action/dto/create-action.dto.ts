@@ -8,8 +8,8 @@ export class CreateActionDto {
   @IsNumber()
   brickId: number;
 
-  @IsNumber()
-  serviceId: number;
+  @IsString()
+  serviceName: string;
 
   @IsString({ each: true })
   arguments: string[];

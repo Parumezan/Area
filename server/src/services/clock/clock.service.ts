@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { BaseService } from '../base/base.service';
 import { Action, ActionType } from '@prisma/client';
+import { LinkerService } from 'src/linker/linker.service';
 
 @Injectable()
 export class ClockService extends BaseService {
@@ -14,7 +15,7 @@ export class ClockService extends BaseService {
     this.prisma.action
       .findMany({
         where: {
-          serviceId: 1,
+          serviceId: -1,
         },
       })
       .then((actions: Action[]) => {
@@ -49,7 +50,7 @@ export class ClockService extends BaseService {
           minute_action === minute_now &&
           second_now === 0
         ) {
-          this.execAllFromAction(action);
+          LinkerService.prototype.execAllFromAction(action, [], this.prisma);
         }
       });
   }
@@ -83,7 +84,7 @@ export class ClockService extends BaseService {
           second_now === 0 &&
           days[day_now] === day
         ) {
-          this.execAllFromAction(action);
+          LinkerService.prototype.execAllFromAction(action, [], this.prisma);
         }
       });
   }

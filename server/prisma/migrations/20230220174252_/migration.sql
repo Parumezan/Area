@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "ActionType" ADD VALUE 'WEATHER_BY_CITY';

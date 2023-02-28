@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
-import { ClockController } from './clock.controller';
-import { ClockService } from './clock.service';
 import { PrismaProvider } from '../../prisma';
 import { LinkerService } from 'src/linker/linker.service';
 import { TwitterService } from '../twitter/twitter.service';
+import { OnePieceController } from './onePiece.controller';
+import { OnePieceService } from './onePiece.service';
 import { TwitchService } from '../twitch/twitch.service';
 
 @Module({
-  controllers: [ClockController],
+  controllers: [OnePieceController],
   providers: [
-    ClockService,
+    OnePieceService,
     PrismaProvider,
     LinkerService,
     TwitterService,
     TwitchService,
   ],
 })
-export class ClockModule {}
+export class onePieceModule {}
