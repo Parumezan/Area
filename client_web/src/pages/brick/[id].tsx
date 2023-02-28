@@ -147,6 +147,10 @@ export default function action() {
                     <div className="flex flex-col justify-around space-y-5 w-full max-h-[150px] h-[150px]">
                       <div className="flex flex-col w-full h-full cursor-pointer">
                         <h2 className="text-white truncate">
+                          {services.forEach((service) => {
+                            if (service.id == action.serviceId)
+                              action.serviceName = service.title;
+                          })}
                           {action.serviceName}
                         </h2>
                         <p className="h-full text-white truncate">
@@ -306,6 +310,7 @@ export default function action() {
                   ))}
                 </select>
                 <input
+                  value={selectedAction.arguments}
                   placeholder="Argument"
                   type="text"
                   className="bg-black text-white rounded-lg p-2"
@@ -317,6 +322,7 @@ export default function action() {
                   }
                 />
                 <input
+                  value={selectedAction.description}
                   placeholder="Description"
                   type="text"
                   className="bg-black text-white rounded-lg p-2"
