@@ -13,6 +13,8 @@ npm i --prefer-offline
 prisma migrate deploy
 prisma generate
 
+node src/fixtures.ts
+
 npm run start:dev
 
 exec "$@"

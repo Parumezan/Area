@@ -49,24 +49,23 @@ export class TwitterService extends BaseService {
       .then((services) => {
         const actions = services.flatMap((service) => service.action);
         actions.forEach((action: Action) => {
-          if (action.isInput === true)
-            switch (action.actionType) {
-              case ActionType.GET_TWEETS_FROM_USER:
-                this.action_GET_TWEETS_FROM_USER(action);
-                break;
-              case ActionType.POST_TWEET_FROM_BOT:
-                this.action_POST_TWEET(action);
-                break;
-              case ActionType.LIKE_TWEET:
-                this.action_LIKE_TWEET(action);
-                break;
-              case ActionType.RETWEET_TWEET:
-                this.action_RETWEET_TWEET(action);
-                break;
-              case ActionType.COMMENT_TWEET:
-                this.action_COMMENT_TWEET(action);
-                break;
-            }
+          switch (action.actionType) {
+            case ActionType.GET_TWEETS_FROM_USER:
+              this.action_GET_TWEETS_FROM_USER(action);
+              break;
+            case ActionType.POST_TWEET_FROM_BOT:
+              this.action_POST_TWEET(action);
+              break;
+            case ActionType.LIKE_TWEET:
+              this.action_LIKE_TWEET(action);
+              break;
+            case ActionType.RETWEET_TWEET:
+              this.action_RETWEET_TWEET(action);
+              break;
+            case ActionType.COMMENT_TWEET:
+              this.action_COMMENT_TWEET(action);
+              break;
+          }
         });
       });
   }

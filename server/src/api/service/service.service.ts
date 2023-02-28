@@ -13,19 +13,13 @@ export class ServiceService {
         accountId: accountId,
       },
     });
-    services.push({
-      id: -1,
-      title: 'Time',
-    } as Service);
-    services.push({
-      id: -2,
-      title: 'Crypto',
-    } as Service);
-    services.push({
-      id: -3,
-      title: 'Meteo',
-    } as Service);
-    return services;
+
+    const baseServices = await this.prisma.service.findMany({
+      where: {
+        accountId: -1,
+      },
+    });
+    return services.concat(baseServices);
   }
 
   async createService(
