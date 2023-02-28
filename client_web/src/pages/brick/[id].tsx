@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
 
-import type { ActionProps, ServiceProps } from "@/types/type";
+import { ActionProps, ServiceProps, servicesMap } from "@/types/type";
 import Popup from "@/components/Popup";
 import Container from "@/components/Container";
 import Button from "@/components/Button";
@@ -11,37 +11,18 @@ import Button from "@/components/Button";
 export default function action() {
   const router = useRouter();
   const [actions, setActions] = useState<ActionProps[]>([]);
-  const [services, setServices] = useState<ServiceProps[]>([
-    {
-      title: "Twitter",
-      serviceToken: "ntm",
-      serviceRefreshToken: "",
-    },
-  ]);
+  const [services, setServices] = useState<ServiceProps[]>([]);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showCreatePopup, setShowCreatePopup] = useState(false);
-  const [selectedAction, setSelectedAction] = useState<ActionProps>({
-    id: 0,
-    service: {
-      title: "",
-      serviceToken: "",
-      serviceRefreshToken: "",
-    },
-    description: "",
-    isReaction: false,
-    arguments: [],
-  });
+  const [selectedAction, setSelectedAction] = useState<ActionProps>();
 
-  async function createAction(action: ActionProps) {
+  async function createAction(props: ActionProps) {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACK_URL}/api/action`,
       {
         method: "POST",
         body: JSON.stringify({
-          service: action.service,
-          description: action.description,
-          isReaction: action.isReaction,
-          arguments: action.arguments,
+          ...props,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -54,18 +35,15 @@ export default function action() {
       window.location.reload();
     } else {
       const json = await response.json();
-      if (Array.isArray(json)) setActions([...actions, ...json]);
+      setActions([...actions, json]);
     }
   }
 
-  function editAction(action: ActionProps) {
-    fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/action/${action.id}`, {
+  function editAction(props: ActionProps) {
+    fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/action/${props.id}`, {
       method: "PATCH",
       body: JSON.stringify({
-        service: action.service,
-        description: action.description,
-        isReaction: action.isReaction,
-        arguments: action.arguments,
+        ...props,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -79,10 +57,10 @@ export default function action() {
       })
       .then(() => {
         // update the action with the id of action.id
-        const idx = actions.findIndex((b) => b.id === action.id);
+        const idx = actions.findIndex((b) => b.id === props.id);
         setActions([
           ...actions.slice(0, idx),
-          action,
+          props,
           ...actions.slice(idx + 1),
         ]);
       })
@@ -115,7 +93,7 @@ export default function action() {
       });
   }
 
-  async function fetchData() {
+  async function fetchActions() {
     await fetch(
       `${process.env.NEXT_PUBLIC_BACK_URL}/api/action/brick/${router.query.id}`,
       {
@@ -134,8 +112,27 @@ export default function action() {
       .catch(() => {});
   }
 
+  async function fetchServices() {
+    await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/service`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then(async (response) => {
+        if (response.status !== 404) {
+          const json = await response.json();
+          setServices(json);
+        }
+      })
+      .catch(() => {});
+  }
+
   useEffect(() => {
-    if (router.isReady) fetchData();
+    if (router.isReady) {
+      fetchServices();
+      fetchActions();
+    }
   }, [router]);
 
   return (
@@ -148,11 +145,10 @@ export default function action() {
                 actions.map((action: ActionProps, index: number) => (
                   <Container key={index}>
                     <div className="flex flex-col justify-around space-y-5 w-full max-h-[150px] h-[150px]">
-                      <div
-                        className="flex flex-col w-full h-full cursor-pointer"
-                        onClick={() => router.push(`/action/${index}`)}
-                      >
-                        <h2 className="text-white truncate">{action}</h2>
+                      <div className="flex flex-col w-full h-full cursor-pointer">
+                        <h2 className="text-white truncate">
+                          {action.serviceName}
+                        </h2>
                         <p className="h-full text-white truncate">
                           {action.description}
                         </p>
@@ -160,6 +156,10 @@ export default function action() {
                       <div className="flex flex-row space-x-5">
                         <Button
                           onClick={() => {
+                            services.forEach((service) => {
+                              if (service.id == action.serviceId)
+                                action.serviceName = service.title;
+                            });
                             setSelectedAction(action);
                             setShowEditPopup(true);
                           }}
@@ -179,15 +179,14 @@ export default function action() {
                     className="w-full h-full rounded-lg p-2 cursor-pointer"
                     onClick={() => {
                       setSelectedAction({
-                        id: 0,
-                        service: {
-                          title: "",
-                          serviceToken: "",
-                          serviceRefreshToken: "",
-                        },
+                        id: actions.length,
+                        serviceName: "Time",
                         description: "",
-                        isReaction: false,
                         arguments: [],
+                        brickId: parseInt(router.query.id[0]),
+                        serviceId: -1,
+                        actionType: "TIME_IS_X",
+                        isInput: true,
                       });
                       setShowCreatePopup(true);
                     }}
@@ -203,31 +202,51 @@ export default function action() {
               <div className="flex flex-col space-y-8">
                 <h2 className="text-white text-center">Create an action</h2>
                 <select
-                  value={selectedAction.service.title}
                   onChange={(e) => {
                     setSelectedAction({
                       ...selectedAction,
-                      service: {
-                        title: e.target.value,
-                        serviceRefreshToken:
-                          selectedAction.service.serviceRefreshToken,
-                        serviceToken: selectedAction.service.serviceToken,
-                      },
+                      serviceName: e.target.value,
+                      actionType: servicesMap[e.target.value][0],
                     });
                   }}
                   className="bg-black text-white rounded-lg p-2"
                 >
-                  {services.map((service) => (
-                    <option key={service.title} value={service.title}>
-                      {service.title}
+                  {services.map((key) => (
+                    <option key={key.title} value={key.title}>
+                      {key.title}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  onChange={(e) => {
+                    setSelectedAction({
+                      ...selectedAction,
+                      actionType: e.target.value,
+                    });
+                  }}
+                  className="bg-black text-white rounded-lg p-2"
+                >
+                  {servicesMap[selectedAction.serviceName].map((key) => (
+                    <option key={key} value={key}>
+                      {key}
                     </option>
                   ))}
                 </select>
                 <input
+                  placeholder="Argument"
+                  type="text"
+                  className="bg-black text-white rounded-lg p-2"
+                  onChange={(e) =>
+                    setSelectedAction({
+                      ...selectedAction,
+                      arguments: [e.target.value],
+                    })
+                  }
+                />
+                <input
                   placeholder="Description"
                   type="text"
                   className="bg-black text-white rounded-lg p-2"
-                  value={selectedAction.description}
                   onChange={(e) =>
                     setSelectedAction({
                       ...selectedAction,
@@ -254,33 +273,53 @@ export default function action() {
           {showEditPopup && (
             <Popup>
               <div className="flex flex-col space-y-8">
-                <h2 className="text-white text-center">Edit a action</h2>
+                <h2 className="text-white text-center">Edit an action</h2>
                 <select
-                  value={selectedAction.service.title}
                   onChange={(e) => {
                     setSelectedAction({
                       ...selectedAction,
-                      service: {
-                        title: e.target.value,
-                        serviceRefreshToken:
-                          selectedAction.service.serviceRefreshToken,
-                        serviceToken: selectedAction.service.serviceToken,
-                      },
+                      serviceName: e.target.value,
+                      actionType: servicesMap[e.target.value][0],
                     });
                   }}
                   className="bg-black text-white rounded-lg p-2"
                 >
-                  {services.map((service) => (
-                    <option key={service.title} value={service.title}>
-                      {service.title}
+                  {services.map((key) => (
+                    <option key={key.title} value={key.title}>
+                      {key.title}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  onChange={(e) => {
+                    setSelectedAction({
+                      ...selectedAction,
+                      actionType: e.target.value,
+                    });
+                  }}
+                  className="bg-black text-white rounded-lg p-2"
+                >
+                  {servicesMap[selectedAction.serviceName].map((key) => (
+                    <option key={key} value={key}>
+                      {key}
                     </option>
                   ))}
                 </select>
                 <input
+                  placeholder="Argument"
+                  type="text"
+                  className="bg-black text-white rounded-lg p-2"
+                  onChange={(e) =>
+                    setSelectedAction({
+                      ...selectedAction,
+                      arguments: [e.target.value],
+                    })
+                  }
+                />
+                <input
                   placeholder="Description"
                   type="text"
                   className="bg-black text-white rounded-lg p-2"
-                  value={selectedAction.description}
                   onChange={(e) =>
                     setSelectedAction({
                       ...selectedAction,
@@ -302,8 +341,8 @@ export default function action() {
                   </Button>
                   <Button
                     onClick={() => {
-                      setShowEditPopup(false);
                       editAction(selectedAction);
+                      setShowEditPopup(false);
                     }}
                   >
                     Validate

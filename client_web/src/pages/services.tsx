@@ -21,6 +21,40 @@ export default function Services() {
     );
   };
 
+  const twitterLogin = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/twitter/requestToken`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const data = await res.text();
+      router.push(
+        `https://api.twitter.com/oauth/authorize?oauth_token=${data}&scope=write`
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const twitchLoggin = () => {
+    const redirectUri = encodeURIComponent(
+      `${process.env.NEXT_PUBLIC_OAUTH2_REDIRECT_URI}_twitch`
+    );
+    const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+    const scope = encodeURIComponent(
+      "user:read:email channel:read:subscriptions user:manage:whispers"
+    );
+    router.push(
+      `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`
+    );
+  };
+
   const services: Service[] = [
     {
       name: "Google",
@@ -30,7 +64,12 @@ export default function Services() {
     {
       name: "Twitter",
       img: "/assets/twitter_logo.png",
-      login: () => {},
+      login: twitterLogin,
+    },
+    {
+      name: "Twitch",
+      img: "/assets/twitch_logo.png",
+      login: twitchLoggin,
     },
   ];
 
