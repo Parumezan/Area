@@ -64,3 +64,5 @@ yarn-error.log
 
 # Ignore VSCode files
 .vscode
+
+.env

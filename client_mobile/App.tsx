@@ -1,20 +1,32 @@
-import * as eva from '@eva-design/eva';
-import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
-import {EvaIconsPack} from '@ui-kitten/eva-icons';
-import AppNavigator from './components/navigation';
-import SystemNavigationBar from 'react-native-system-navigation-bar';
+import React from 'react';
 import {TailwindProvider} from 'tailwind-rn';
 import utilities from './tailwind.json';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import {RootStackParamList} from './types/RootStackParamList';
 
-SystemNavigationBar.immersive();
+import Dashboard from './pages/dashboard';
+import Login from './pages/login';
+import Register from './pages/register';
+import BrickEdit from './pages/brickEdit';
+import Services from './pages/services';
+import Actions from './pages/actions';
+
+const RootStack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
     <TailwindProvider utilities={utilities}>
-      <IconRegistry icons={EvaIconsPack} />
-      <ApplicationProvider {...eva} theme={eva.dark}>
-        <AppNavigator />
-      </ApplicationProvider>
+      <NavigationContainer>
+        <RootStack.Navigator screenOptions={{headerShown: false}}>
+          <RootStack.Screen name="Login" component={Login} />
+          <RootStack.Screen name="Register" component={Register} />
+          <RootStack.Screen name="Dashboard" component={Dashboard} />
+          <RootStack.Screen name="Services" component={Services} />
+          <RootStack.Screen name="BrickEdit" component={BrickEdit} />
+          <RootStack.Screen name="Actions" component={Actions} />
+        </RootStack.Navigator>
+      </NavigationContainer>
     </TailwindProvider>
   );
 }
