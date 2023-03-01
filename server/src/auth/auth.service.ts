@@ -2,6 +2,7 @@ import { Injectable, Inject, HttpException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Account, PrismaClient } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
+import { OauthGoogleDto } from './dto/oauthGoogleDto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -34,7 +35,6 @@ export class AuthService {
     if (!DBuser) {
       throw new HttpException('Forbidden', 403);
     }
-    console.log('login == ' + DBuser.id);
     return {
       access_token: this.jwtService.sign({
         id: DBuser.id,
@@ -61,6 +61,43 @@ export class AuthService {
       data: {
         email: user.email,
         password: hashedPassword,
+      },
+    });
+    return {
+      access_token: this.jwtService.sign({
+        id: newUser.id,
+        email: newUser.email,
+      }),
+    };
+  }
+
+  async oauthGoogle(user: OauthGoogleDto) {
+    const data = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/http',
+        Authorization: `Bearer ${user.oauthToken}`,
+      },
+    });
+    const response = await data.text();
+    const json = JSON.parse(response);
+
+    const userId = await this.prisma.account.findUnique({
+      where: { email: json.email },
+    });
+    if (userId) {
+      return {
+        access_token: this.jwtService.sign({
+          id: userId.id,
+          email: userId.email,
+        }),
+      };
+    }
+
+    const newUser = await this.prisma.account.create({
+      data: {
+        email: json.email,
+        password: '',
       },
     });
     return {

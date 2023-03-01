@@ -151,7 +151,6 @@ export class TwitterService extends BaseService {
           );
         },
       );
-      console.log(accessToken);
       return accessToken;
     } catch (err) {
       throw new Error('Error getting twitter access token');
@@ -179,7 +178,6 @@ export class TwitterService extends BaseService {
 
   async action_POST_TWEET(action: Action) {
     if (action.arguments.length < 1) return;
-    console.log(action.arguments[0]);
     const service = await this.prisma.service.findFirst({
       where: {
         id: action.serviceId,

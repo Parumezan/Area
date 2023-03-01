@@ -17,6 +17,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
+import { OauthGoogleDto } from './dto/oauthGoogleDto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -87,6 +88,38 @@ export class AuthController {
   })
   async register(@Body() body: LoginDto) {
     return this.authService.register(body);
+  }
+
+  @Post('oauthGoogle')
+  @ApiOperation({
+    summary: 'Oauth Google',
+    description: 'Oauth Google and returns a JWT token.',
+  })
+  @ApiBody({
+    type: OauthGoogleDto,
+    required: true,
+    description: 'Oauth Google',
+    examples: {
+      user: {
+        value: {
+          idToken: '',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: 'object',
+      properties: {
+        access_token: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  async oauthGoogle(@Body() body: OauthGoogleDto) {
+    return this.authService.oauthGoogle(body);
   }
 
   @UseGuards(AuthGuard('jwt'))

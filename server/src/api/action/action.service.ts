@@ -91,15 +91,24 @@ export class ActionService {
       where: { id: id },
     });
     if (!action) throw new HttpException('Forbidden', 403);
+    let service = await this.prisma.service.findFirst({
+      where: { accountId: accountId, title: data.serviceName },
+    });
+
+    if (service === null)
+      service = await this.prisma.service.findFirst({
+        where: { accountId: -1, title: data.serviceName },
+      });
     const brick = await this.prisma.brick.findUnique({
       where: { id: action.brickId },
     });
     if (!brick) throw new HttpException('Forbidden', 403);
     if (brick.accountId !== accountId)
       throw new HttpException('Forbidden', 403);
+    delete data.serviceName;
     return this.prisma.action.update({
       where: { id: id },
-      data: data,
+      data: { ...data, serviceId: service.id },
     });
   }
 
