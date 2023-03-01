@@ -87,10 +87,6 @@ export default function Services() {
               alt={service.name}
               width={75}
               height={75}
-              style={{
-                width: 75,
-                height: 75,
-              }}
             />
           </button>
         ))}

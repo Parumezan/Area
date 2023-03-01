@@ -2,11 +2,18 @@ import { LockClosedIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import Image from "next/image";
 
 type Form = {
   email: string;
   password: string;
 };
+
+interface Service {
+  name: string;
+  img: string;
+  login: Function;
+}
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -14,6 +21,16 @@ export default function RegisterForm() {
     email: "",
     password: "",
   });
+
+  const oauthGoogle = () => {
+    router.push(
+      `https://accounts.google.com/o/oauth2/v2/auth?client_id=${
+        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+      }&redirect_uri=${encodeURIComponent(
+        process.env.NEXT_PUBLIC_OAUTH2_REDIRECT_URI + "_google"
+      )}&response_type=code&scope=openid%20email`
+    );
+  };
 
   function handleInput(e) {
     const fieldName = e.target.name;
@@ -50,6 +67,16 @@ export default function RegisterForm() {
         console.log(error);
       });
   }
+
+  const services: Service[] = [
+    {
+      name: "Google",
+      img: "/assets/google_logo.png",
+      login: () => {
+        oauthGoogle();
+      },
+    },
+  ];
 
   return (
     <div className="w-full">
@@ -119,6 +146,27 @@ export default function RegisterForm() {
               </Link>
             </div>
           </form>
+          <div className="w-full border border-gray-500 rounded-xl m-auto overflow-hidden drop-shadow-lg my-10">
+            {services.map((service) => (
+              <button
+                onClick={() => service.login()}
+                className="flex flex-row justify-between w-full p-5 bg-opacity-75 bg-gray-700 hover:bg-opacity-90 transition"
+                key={service.name}
+              >
+                <div className="w-fit h-fit shrink-0">
+                  <Image
+                    src={service.img}
+                    alt={service.name}
+                    width={30}
+                    height={30}
+                  />
+                </div>
+                <h5 className="m-auto text-xl">
+                  Se connecter avec {service.name}
+                </h5>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

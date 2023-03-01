@@ -30,6 +30,23 @@ function CallbackPage({ code }) {
         const data = await response.json();
 
         localStorage.setItem("google_token", data.access_token);
+
+        fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/auth/oauthGoogle`, {
+          method: "POST",
+          body: JSON.stringify({
+            oauthToken: data.access_token,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).then(async (response) => {
+          if (response.status === 401 || response.status === 403) {
+            alert("Wrong email or password");
+          } else {
+            const json = await response.json();
+            localStorage.setItem("token", json.access_token);
+          }
+        });
         setLoading(false);
       } catch (err) {
         setError(err);
