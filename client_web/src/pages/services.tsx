@@ -11,16 +11,6 @@ interface Service {
 export default function Services() {
   const router = useRouter();
 
-  const googleLogin = () => {
-    router.push(
-      `https://accounts.google.com/o/oauth2/v2/auth?client_id=${
-        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-      }&redirect_uri=${encodeURIComponent(
-        process.env.NEXT_PUBLIC_OAUTH2_REDIRECT_URI + "_google"
-      )}&response_type=code&scope=openid%20email`
-    );
-  };
-
   const twitterLogin = async () => {
     try {
       const res = await fetch(
@@ -48,7 +38,7 @@ export default function Services() {
     );
     const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
     const scope = encodeURIComponent(
-      "user:read:email channel:read:subscriptions user:manage:whispers"
+      "user:read:email channel:read:subscriptions user:manage:whispers user:manage:blocked_users"
     );
     router.push(
       `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`
@@ -56,11 +46,6 @@ export default function Services() {
   };
 
   const services: Service[] = [
-    {
-      name: "Google",
-      img: "/assets/google_logo.png",
-      login: googleLogin,
-    },
     {
       name: "Twitter",
       img: "/assets/twitter_logo.png",
@@ -87,6 +72,10 @@ export default function Services() {
               alt={service.name}
               width={75}
               height={75}
+              style={{
+                width: 75,
+                height: 75,
+              }}
             />
           </button>
         ))}

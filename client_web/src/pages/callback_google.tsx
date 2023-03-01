@@ -14,27 +14,30 @@ function CallbackPage({ code }) {
   useEffect(() => {
     const fetchAccessToken = async () => {
       try {
-        const response = await fetch(`https://oauth2.googleapis.com/token`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: `code=${code}&client_id=${
-            process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-          }&client_secret=${
-            process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET
-          }&redirect_uri=${encodeURIComponent(
-            process.env.NEXT_PUBLIC_OAUTH2_REDIRECT_URI + "_google"
-          )}&grant_type=authorization_code`,
+        await fetch(
+          `${process.env.NEXT_PUBLIC_BACK_URL}/auth/requestGoogleToken`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              oauthToken: code,
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        ).then(async (response) => {
+          if (response.status === 401 || response.status === 403) {
+            alert("Wrong email or password");
+            return;
+          } else {
+            const data = await response.json();
+            localStorage.setItem("token", data.access_token);
+          }
         });
-        const data = await response.json();
-
-        localStorage.setItem("google_token", data.access_token);
-
         fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/auth/oauthGoogle`, {
           method: "POST",
           body: JSON.stringify({
-            oauthToken: data.access_token,
+            oauthToken: localStorage.getItem("token"),
           }),
           headers: {
             "Content-Type": "application/json",
