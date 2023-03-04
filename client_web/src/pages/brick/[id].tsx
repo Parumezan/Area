@@ -10,8 +10,10 @@ import Button from "@/components/Button";
 
 export default function action() {
   const router = useRouter();
-  const [actions, setActions] = useState<ActionProps[]>([]);
+
   const [services, setServices] = useState<ServiceProps[]>([]);
+
+  const [actions, setActions] = useState<ActionProps[]>([]);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showCreatePopup, setShowCreatePopup] = useState(false);
   const [selectedAction, setSelectedAction] = useState<ActionProps>();
@@ -93,25 +95,6 @@ export default function action() {
       });
   }
 
-  async function fetchActions() {
-    await fetch(
-      `${process.env.NEXT_PUBLIC_BACK_URL}/api/action/brick/${router.query.id}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    )
-      .then(async (response) => {
-        if (response.status !== 404) {
-          const json = await response.json();
-          setActions(json);
-        }
-      })
-      .catch(() => {});
-  }
-
   async function fetchServices() {
     await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/service`, {
       method: "GET",
@@ -125,7 +108,32 @@ export default function action() {
           setServices(json);
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function fetchActions() {
+    fetch(
+      `${process.env.NEXT_PUBLIC_BACK_URL}/api/action/brick/${router.query.id}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    )
+      .then((response) => {
+        return response.json();
+      })
+      .then(async (response) => {
+        if (response.status !== 404) {
+          setActions(response);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   useEffect(() => {
@@ -139,45 +147,48 @@ export default function action() {
     <div>
       <DefaultWrapper>
         <div className="w-full h-full flex flex-row">
-          <div className="w-full h-full flex flex-col justify-between">
-            <div className="w-full h-full grid grid-cols-4 grid-flow-row-dense p-4 gap-4">
-              {actions.length &&
-                actions.map((action: ActionProps, index: number) => (
-                  <Container key={index}>
-                    <div className="flex flex-col justify-around space-y-5 w-full max-h-[150px] h-[150px]">
-                      <div className="flex flex-col w-full h-full cursor-pointer">
-                        <h2 className="text-white truncate">
-                          {services.forEach((service) => {
-                            if (service.id == action.serviceId)
-                              action.serviceName = service.title;
-                          })}
-                          {action.serviceName}
-                        </h2>
-                        <p className="h-full text-white truncate">
-                          {action.description}
-                        </p>
-                      </div>
-                      <div className="flex flex-row space-x-5">
-                        <Button
-                          onClick={() => {
-                            services.forEach((service) => {
+          <div className="w-1/2 h-full flex flex-col justify-between">
+            <div className="flex flex-col space-y-5 w-full h-full p-4">
+              {actions.map((action: ActionProps, index: number) => {
+                if (action.isInput == true) {
+                  return (
+                    <Container key={index}>
+                      <div className="w-full justify-around space-y-5 max-h-[150px]">
+                        <div className="flex flex-col w-full h-full cursor-pointer">
+                          <h2 className="text-white truncate">
+                            {services.forEach((service) => {
                               if (service.id == action.serviceId)
                                 action.serviceName = service.title;
-                            });
-                            setSelectedAction(action);
-                            setShowEditPopup(true);
-                          }}
-                        >
-                          Edit
-                        </Button>
+                            })}
+                            {action.serviceName}
+                          </h2>
+                          <p className="h-full text-white truncate">
+                            {action.description}
+                          </p>
+                        </div>
+                        <div className="flex flex-row space-x-5">
+                          <Button
+                            onClick={() => {
+                              services.forEach((service) => {
+                                if (service.id == action.serviceId)
+                                  action.serviceName = service.title;
+                              });
+                              setSelectedAction(action);
+                              setShowEditPopup(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </Container>
-                ))}
+                    </Container>
+                  );
+                }
+              })}
             </div>
 
             <div className="w-full h-full p-4 flex flex-row justify-center">
-              <div className="w-1/3">
+              <div className="w-full">
                 <Container>
                   <div
                     className="w-full h-full rounded-lg p-2 cursor-pointer"
@@ -201,25 +212,99 @@ export default function action() {
               </div>
             </div>
           </div>
+
+          <div className="w-1/2 h-full flex flex-col justify-between">
+            <div className="flex flex-col space-y-5 w-full h-full p-4">
+              {actions.map((action: ActionProps, index: number) => {
+                if (action.isInput == false) {
+                  return (
+                    <Container key={index}>
+                      <div className="w-full justify-around space-y-5 max-h-[150px]">
+                        <div className="flex flex-col w-full h-full cursor-pointer">
+                          <h2 className="text-white truncate">
+                            {services.forEach((service) => {
+                              if (service.id == action.serviceId)
+                                action.serviceName = service.title;
+                            })}
+                            {action.serviceName}
+                          </h2>
+                          <p className="h-full text-white truncate">
+                            {action.description}
+                          </p>
+                        </div>
+                        <div className="flex flex-row space-x-5">
+                          <Button
+                            onClick={() => {
+                              services.forEach((service) => {
+                                if (service.id == action.serviceId)
+                                  action.serviceName = service.title;
+                              });
+                              setSelectedAction(action);
+                              setShowEditPopup(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                        </div>
+                      </div>
+                    </Container>
+                  );
+                }
+              })}
+            </div>
+
+            <div className="w-full h-full p-4 flex flex-row justify-center">
+              <div className="w-full">
+                <Container>
+                  <div
+                    className="w-full h-full rounded-lg p-2 cursor-pointer"
+                    onClick={() => {
+                      setSelectedAction({
+                        id: actions.length,
+                        serviceName: "",
+                        description: "",
+                        arguments: [],
+                        brickId: parseInt(router.query.id[0]),
+                        serviceId: -1,
+                        actionType: "",
+                        isInput: false,
+                      });
+                      setShowCreatePopup(true);
+                    }}
+                  >
+                    <PlusCircleIcon className="w-16 h-16 m-auto fill-white" />
+                  </div>
+                </Container>
+              </div>
+            </div>
+          </div>
+
           {showCreatePopup && (
             <Popup>
               <div className="flex flex-col space-y-8">
-                <h2 className="text-white text-center">Create an action</h2>
+                <h2 className="text-white text-center">
+                  Create {selectedAction.isInput ? "an action" : "a reaction"}
+                </h2>
                 <select
                   onChange={(e) => {
                     setSelectedAction({
                       ...selectedAction,
                       serviceName: e.target.value,
-                      actionType: servicesMap[e.target.value][0],
                     });
                   }}
                   className="bg-black text-white rounded-lg p-2"
                 >
-                  {services.map((key) => (
-                    <option key={key.title} value={key.title}>
-                      {key.title}
-                    </option>
-                  ))}
+                  {services
+                    .filter((key) =>
+                      servicesMap[
+                        selectedAction.isInput ? "action" : "reaction"
+                      ].hasOwnProperty(key.title)
+                    )
+                    .map((key) => (
+                      <option key={key.title} value={key.title}>
+                        {key.title}
+                      </option>
+                    ))}
                 </select>
                 <select
                   onChange={(e) => {
@@ -230,14 +315,17 @@ export default function action() {
                   }}
                   className="bg-black text-white rounded-lg p-2"
                 >
-                  {servicesMap[selectedAction.serviceName].map((key) => (
-                    <option key={key} value={key}>
-                      {key}
-                    </option>
-                  ))}
+                  {selectedAction.serviceName.length &&
+                    servicesMap[selectedAction.isInput ? "action" : "reaction"][
+                      selectedAction.serviceName
+                    ].map((key) => (
+                      <option key={key} value={key}>
+                        {key}
+                      </option>
+                    ))}
                 </select>
                 <input
-                  placeholder="Argument"
+                  placeholder="Arguments separated by |"
                   type="text"
                   className="bg-black text-white rounded-lg p-2"
                   onChange={(e) =>
@@ -283,7 +371,10 @@ export default function action() {
                     setSelectedAction({
                       ...selectedAction,
                       serviceName: e.target.value,
-                      actionType: servicesMap[e.target.value][0],
+                      actionType:
+                        servicesMap[
+                          selectedAction.isInput ? "action" : "reaction"
+                        ][e.target.value][0],
                     });
                   }}
                   className="bg-black text-white rounded-lg p-2"
@@ -303,7 +394,9 @@ export default function action() {
                   }}
                   className="bg-black text-white rounded-lg p-2"
                 >
-                  {servicesMap[selectedAction.serviceName].map((key) => (
+                  {servicesMap[selectedAction.isInput ? "action" : "reaction"][
+                    selectedAction.serviceName
+                  ].map((key) => (
                     <option key={key} value={key}>
                       {key}
                     </option>
