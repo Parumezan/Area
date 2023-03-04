@@ -122,7 +122,7 @@ export class AuthController {
     examples: {
       user: {
         value: {
-          idToken: '',
+          oauthToken: '',
         },
       },
     },
