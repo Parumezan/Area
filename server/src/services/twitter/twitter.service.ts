@@ -1,4 +1,6 @@
-import { Injectable, Req } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import { LinkerService } from 'src/linker/linker.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { BaseService } from '../base/base.service';
 import * as OAuth from 'oauth';
@@ -21,17 +23,22 @@ interface TwitterAccessToken {
 
 @Injectable()
 export class TwitterService extends BaseService {
+  constructor(
+    @Inject('Prisma') protected readonly prisma: PrismaClient,
+    private readonly linkerService: LinkerService,
+  ) {
+    super(prisma);
+  }
   private oAuthClient: OAuth.OAuth = new OAuth.OAuth(
     'https://api.twitter.com/oauth/request_token',
     'https://api.twitter.com/oauth/access_token',
     env.TWITTER_CONSUMER_KEY,
     env.TWITTER_CONSUMER_SECRET,
     '1.0A',
-    env.TWITTER_CALLBACK_URL,
+    env.OAUTH2_REDIRECT_URI + '_twitter',
     'HMAC-SHA1',
   );
-
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   handleCron() {
     this.prisma.service
       .findMany({
@@ -51,19 +58,7 @@ export class TwitterService extends BaseService {
         actions.forEach((action: Action) => {
           switch (action.actionType) {
             case ActionType.GET_TWEETS_FROM_USER:
-              this.action_GET_TWEETS_FROM_USER(action);
-              break;
-            case ActionType.POST_TWEET_FROM_BOT:
-              this.action_POST_TWEET(action);
-              break;
-            case ActionType.LIKE_TWEET:
-              this.action_LIKE_TWEET(action);
-              break;
-            case ActionType.RETWEET_TWEET:
-              this.action_RETWEET_TWEET(action);
-              break;
-            case ActionType.COMMENT_TWEET:
-              this.action_COMMENT_TWEET(action);
+              this.action_GET_NEW_TWEET_FROM_USER(action);
               break;
           }
         });
@@ -157,7 +152,7 @@ export class TwitterService extends BaseService {
     }
   }
 
-  async action_GET_TWEETS_FROM_USER(action: Action) {
+  async action_GET_NEW_TWEET_FROM_USER(action: Action) {
     const service = await this.prisma.service.findFirst({
       where: {
         id: action.serviceId,
@@ -173,12 +168,20 @@ export class TwitterService extends BaseService {
       screen_name: action.arguments[0],
       count: 1,
     });
+    if (tweet.data.length == 0) return;
+    if (action.arguments.length < 2) action.arguments.push(tweet.data[0]?.text);
+    if (action.arguments[1] == tweet.data[0]?.text) return;
+    this.linkerService.execAllFromAction(
+      action,
+      [tweet.data[0]?.text],
+      this.prisma,
+    );
     return tweet.data[0]?.text;
   }
 
-  async action_POST_TWEET(action: Action) {
+  async action_POST_TWEET(action: Action, prisma: PrismaClient) {
     if (action.arguments.length < 1) return;
-    const service = await this.prisma.service.findFirst({
+    const service = await prisma.service.findFirst({
       where: {
         id: action.serviceId,
       },
@@ -201,7 +204,7 @@ export class TwitterService extends BaseService {
         }
       },
     );
-    await this.prisma.action.update({
+    await prisma.action.update({
       where: {
         id: action.id,
       },
@@ -211,8 +214,8 @@ export class TwitterService extends BaseService {
     });
   }
 
-  async action_LIKE_TWEET(action: Action) {
-    const service = await this.prisma.service.findFirst({
+  async action_LIKE_TWEET(action: Action, prisma: PrismaClient) {
+    const service = await prisma.service.findFirst({
       where: {
         id: action.serviceId,
       },
@@ -233,8 +236,8 @@ export class TwitterService extends BaseService {
     });
   }
 
-  async action_RETWEET_TWEET(action: Action) {
-    const service = await this.prisma.service.findFirst({
+  async action_RETWEET_TWEET(action: Action, prisma: PrismaClient) {
+    const service = await prisma.service.findFirst({
       where: {
         id: action.serviceId,
       },
@@ -255,8 +258,8 @@ export class TwitterService extends BaseService {
     });
   }
 
-  async action_COMMENT_TWEET(action: Action) {
-    const service = await this.prisma.service.findFirst({
+  async action_COMMENT_TWEET(action: Action, prisma: PrismaClient) {
+    const service = await prisma.service.findFirst({
       where: {
         id: action.serviceId,
       },

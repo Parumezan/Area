@@ -1,11 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { BaseService } from '../base/base.service';
 import axios, { AxiosRequestConfig } from 'axios';
 import { Action, ActionType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import { LinkerService } from 'src/linker/linker.service';
 
 @Injectable()
 export class TwitchService extends BaseService {
+  constructor(@Inject('Prisma') protected readonly prisma: PrismaClient) {
+    super(prisma);
+  }
+  private readonly linkerService: LinkerService = new LinkerService();
   private twitchApiUrl = 'https://api.twitch.tv/helix';
 
   async getTwitchAccessToken(code: string) {
@@ -15,12 +21,13 @@ export class TwitchService extends BaseService {
         client_secret: process.env.TWITCH_CLIENT_SECRET,
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: process.env.TWITCH_CALLBACK_URL,
+        redirect_uri: process.env.OAUTH2_REDIRECT_URI + '_twitch',
       });
+      console.log(response.data);
       const tokens = response.data;
       return tokens;
     } catch (error) {
-      console.log(error);
+      console.log("Can't get access token");
     }
   }
 
@@ -38,15 +45,6 @@ export class TwitchService extends BaseService {
         actions.forEach((action: Action) => {
           if (action.isInput === true)
             switch (action.actionType) {
-              case ActionType.SEND_WHISPERS_TWITCH:
-                this.action_SEND_MESSAGE(action);
-                break;
-              case ActionType.BLOCK_USER_TWITCH:
-                this.action_BLOCK_USER(action);
-                break;
-              case ActionType.UNBLOCK_USER_TWITCH:
-                this.action_UNBLOCK_USER(action);
-                break;
               case ActionType.DETECT_STREAMERS_PLAY_GAMES_TWITCH:
                 this.action_DETECT_STREAMERS_PLAY_GAMES(action);
                 break;
@@ -156,15 +154,17 @@ export class TwitchService extends BaseService {
       if (response.data.data.length == 0) return -1;
       const game = response.data.data[0];
       const gameId = game.id;
+      console.log(gameId);
       return gameId;
     } catch (error) {
+      console.log(gameName);
       console.log('Error getting game ID:', error.response.data);
       return -1;
     }
   }
 
-  async action_SEND_MESSAGE(action: Action) {
-    const service = await this.prisma.service.findFirst({
+  async action_SEND_MESSAGE(action: Action, prisma: PrismaClient) {
+    const service = await prisma.service.findFirst({
       where: {
         id: action.serviceId,
       },
@@ -208,8 +208,8 @@ export class TwitchService extends BaseService {
     }
   }
 
-  async action_BLOCK_USER(action: Action) {
-    const service = await this.prisma.service.findFirst({
+  async action_BLOCK_USER(action: Action, prisma: PrismaClient) {
+    const service = await prisma.service.findFirst({
       where: {
         id: action.serviceId,
       },
@@ -218,28 +218,32 @@ export class TwitchService extends BaseService {
       'Client-ID': process.env.TWITCH_CLIENT_ID,
       Authorization: `Bearer ${service.serviceToken}`,
     };
+    const twitchApiUrl = 'https://api.twitch.tv/helix';
     for (let i = 0; i < action.arguments.length; i++) {
       const options: AxiosRequestConfig = {
         method: 'PUT',
-        url: `${this.twitchApiUrl}/users/blocks`,
+        url: `${twitchApiUrl}/users/blocks`,
         headers: headers,
         data: { target_user_id: action.arguments[i] },
       };
       try {
         const response = await axios(options);
         if (response.status === 204) {
-          console.log('Request was successful!');
+          console.log(
+            'Request was successful!, user ' + action.arguments[i] + ' blocked',
+          );
         } else {
           console.log(`Request failed with status code: ${response.status}`);
         }
       } catch (error) {
-        console.log('Error unblocking user:', error.response.data);
+        console.log('Error unblocking user:', error);
+        throw new Error('Error unblocking user');
       }
     }
   }
 
-  async action_UNBLOCK_USER(action: Action) {
-    const service = await this.prisma.service.findFirst({
+  async action_UNBLOCK_USER(action: Action, prisma: PrismaClient) {
+    const service = await prisma.service.findFirst({
       where: {
         id: action.serviceId,
       },
@@ -279,7 +283,7 @@ export class TwitchService extends BaseService {
       action.arguments[1],
       service.serviceToken,
     );
-    if (game == -1) return false;
+    if (game == -1) return;
     const headers = {
       'Client-ID': process.env.TWITCH_CLIENT_ID,
       Authorization: `Bearer ${service.serviceToken}`,
@@ -295,18 +299,16 @@ export class TwitchService extends BaseService {
     };
     try {
       const response = await axios(options);
-      if (response.status === 200) {
-        console.log('Request was successful!');
-      } else {
-        console.log(`Request failed with status code: ${response.status}`);
-      }
+      if (response.status !== 200) return;
       if (
         response.data.data.length > 0 &&
         response.data.data[0].game_id === game
       ) {
-        return true;
-      } else {
-        return false;
+        this.linkerService.execAllFromAction(
+          action,
+          [username, game],
+          this.prisma,
+        );
       }
     } catch (error) {
       console.log('Error detecting stream:', error.response.data);
@@ -329,6 +331,7 @@ export class TwitchService extends BaseService {
       'Client-ID': process.env.TWITCH_CLIENT_ID,
       Authorization: `Bearer ${service.serviceToken}`,
     };
+    let listUsers: string[] = [];
     const params = {
       game_id: game,
     };
@@ -340,15 +343,16 @@ export class TwitchService extends BaseService {
     };
     try {
       const response = await axios(options);
-      if (response.status === 200) {
-        console.log('Request was successful!');
-        return response.data.data.map((stream) => stream.user_name);
-      } else {
-        console.log(`Request failed with status code: ${response.status}`);
+      if (response.status !== 200) return;
+      if (response.data.data.length > 0) {
+        for (let i = 0; i < response.data.data.length; i++)
+          listUsers.push(response.data.data[i].user_id);
       }
     } catch (error) {
-      console.log('Error detecting stream:', error.response.data);
+      console.log('Error detecting stream:', error.data);
       throw new Error('Error detecting stream');
     }
+    console.log(listUsers);
+    this.linkerService.execAllFromAction(action, listUsers, this.prisma);
   }
 }

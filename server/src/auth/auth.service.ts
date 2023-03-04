@@ -71,6 +71,24 @@ export class AuthService {
     };
   }
 
+  async requestGoogleToken(code: string): Promise<string> {
+    const response = await fetch(`https://oauth2.googleapis.com/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `code=${code}&client_id=${
+        process.env.GOOGLE_CLIENT_ID
+      }&client_secret=${
+        process.env.GOOGLE_CLIENT_SECRET
+      }&redirect_uri=${encodeURIComponent(
+        process.env.OAUTH2_REDIRECT_URI + '_google',
+      )}&grant_type=authorization_code`,
+    });
+    const json = await response.json();
+    return json;
+  }
+
   async oauthGoogle(user: OauthGoogleDto) {
     const data = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       method: 'GET',

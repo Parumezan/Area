@@ -5,10 +5,6 @@ import { TwitchService } from 'src/services/twitch/twitch.service';
 
 @Injectable()
 export class LinkerService {
-  constructor(
-    private twitterService: TwitterService,
-    private twitchService: TwitchService,
-  ) {}
   execAllFromAction(action: Action, listArg: string[], prisma: PrismaClient) {
     prisma.brick
       .findUnique({
@@ -30,11 +26,38 @@ export class LinkerService {
                 switch (action.actionType) {
                   case ActionType.POST_TWEET_FROM_BOT:
                     action.arguments = listArg;
-                    this.twitterService.action_POST_TWEET(action);
+                    TwitterService.prototype.action_POST_TWEET(action, prisma);
+                    break;
+                  case ActionType.COMMENT_TWEET:
+                    action.arguments = listArg;
+                    TwitterService.prototype.action_COMMENT_TWEET(
+                      action,
+                      prisma,
+                    );
+                    break;
+                  case ActionType.RETWEET_TWEET:
+                    action.arguments = listArg;
+                    TwitterService.prototype.action_RETWEET_TWEET(
+                      action,
+                      prisma,
+                    );
+                    break;
+                  case ActionType.LIKE_TWEET:
+                    action.arguments = listArg;
+                    TwitterService.prototype.action_LIKE_TWEET(action, prisma);
                     break;
                   case ActionType.SEND_WHISPERS_TWITCH:
                     action.arguments = listArg;
-                    this.twitchService.action_SEND_MESSAGE(action);
+                    TwitchService.prototype.action_SEND_MESSAGE(action, prisma);
+                    break;
+                  case ActionType.BLOCK_USER_TWITCH:
+                    action.arguments = listArg;
+                    TwitchService.prototype.action_BLOCK_USER(action, prisma);
+                    break;
+                  case ActionType.UNBLOCK_USER_TWITCH:
+                    action.arguments = listArg;
+                    TwitchService.prototype.action_UNBLOCK_USER(action, prisma);
+                    break;
                 }
             });
           });

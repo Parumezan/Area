@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Controller, Get, Req, Res, Ip } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -8,5 +8,10 @@ export class AppController {
   @Get()
   redirect(@Req() req: ParameterDecorator, @Res() res: ParameterDecorator) {
     this.appService.redirect(req, res);
+  }
+
+  @Get('about.json')
+  about(@Ip() ip: string) {
+    return this.appService.about(ip);
   }
 }

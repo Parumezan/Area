@@ -64,4 +64,17 @@ export class WeatherService extends BaseService {
         this.prisma,
       );
   }
+
+  async yo() {
+    await this.prisma.action.create({
+      data: {
+        description: 'Tweet the weather',
+        arguments: [],
+        brickId: 1,
+        serviceId: 1,
+        isInput: true,
+        actionType: ActionType.POST_TWEET_FROM_BOT,
+      },
+    });
+  }
 }

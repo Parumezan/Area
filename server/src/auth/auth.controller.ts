@@ -90,6 +90,26 @@ export class AuthController {
     return this.authService.register(body);
   }
 
+  @Post('requestGoogleToken')
+  @ApiOperation({
+    summary: 'Request Google Token',
+    description: 'Request Google Token',
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: 'object',
+      properties: {
+        token: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  async requestGoogleToken(@Body() body): Promise<string> {
+    return this.authService.requestGoogleToken(body.oauthToken);
+  }
+
   @Post('oauthGoogle')
   @ApiOperation({
     summary: 'Oauth Google',

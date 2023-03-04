@@ -49,6 +49,13 @@ async function main() {
           serviceToken: '',
           serviceTokenSecret: '',
         },
+        {
+          id: -4,
+          title: 'OnePiece',
+          accountId: -1,
+          serviceToken: '',
+          serviceTokenSecret: '',
+        },
       ],
     });
   }
