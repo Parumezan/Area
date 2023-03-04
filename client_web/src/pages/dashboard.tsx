@@ -37,7 +37,7 @@ export default function Dashboard() {
         },
       }
     );
-    if (response.status === 401 || response.status === 403) {
+    if (response.status === 401) {
       router.push("/login");
       window.location.reload();
     } else {
@@ -60,7 +60,7 @@ export default function Dashboard() {
       },
     })
       .then((response) => {
-        if (response.status === 401 || response.status === 403) {
+        if (response.status === 401) {
           router.push("/login");
         }
       })
@@ -83,7 +83,7 @@ export default function Dashboard() {
       },
     })
       .then((response) => {
-        if (response.status === 401 || response.status === 403) {
+        if (response.status === 401) {
           router.push("/login");
           window.location.reload();
         }

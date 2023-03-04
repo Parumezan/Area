@@ -32,7 +32,7 @@ export default function action() {
         },
       }
     );
-    if (response.status === 401 || response.status === 403) {
+    if (response.status === 401) {
       router.push("/login");
       window.location.reload();
     } else {
@@ -53,7 +53,7 @@ export default function action() {
       },
     })
       .then((response) => {
-        if (response.status === 401 || response.status === 403) {
+        if (response.status === 401) {
           router.push("/login");
         }
       })
@@ -80,7 +80,7 @@ export default function action() {
       },
     })
       .then((response) => {
-        if (response.status === 401 || response.status === 403) {
+        if (response.status === 401) {
           router.push("/login");
           window.location.reload();
         }
@@ -198,7 +198,7 @@ export default function action() {
                         serviceName: "Time",
                         description: "",
                         arguments: [],
-                        brickId: parseInt(router.query.id[0]),
+                        brickId: parseInt(router.query.id as string),
                         serviceId: -1,
                         actionType: "TIME_IS_X",
                         isInput: true,
@@ -264,7 +264,7 @@ export default function action() {
                         serviceName: "",
                         description: "",
                         arguments: [],
-                        brickId: parseInt(router.query.id[0]),
+                        brickId: parseInt(router.query.id as string),
                         serviceId: -1,
                         actionType: "",
                         isInput: false,
@@ -290,6 +290,10 @@ export default function action() {
                     setSelectedAction({
                       ...selectedAction,
                       serviceName: e.target.value,
+                      actionType:
+                        servicesMap[
+                          selectedAction.isInput ? "action" : "reaction"
+                        ][e.target.value][0].type,
                     });
                   }}
                   className="bg-black text-white rounded-lg p-2"
@@ -319,8 +323,8 @@ export default function action() {
                     servicesMap[selectedAction.isInput ? "action" : "reaction"][
                       selectedAction.serviceName
                     ].map((key) => (
-                      <option key={key} value={key}>
-                        {key}
+                      <option key={key.type} value={key.type}>
+                        {key.type}
                       </option>
                     ))}
                 </select>
@@ -352,6 +356,10 @@ export default function action() {
                   </Button>
                   <Button
                     onClick={() => {
+                      services.forEach((service) => {
+                        if (service.title == selectedAction.serviceName)
+                          selectedAction.serviceId = service.id;
+                      });
                       setShowCreatePopup(false);
                       createAction(selectedAction);
                     }}
@@ -367,6 +375,7 @@ export default function action() {
               <div className="flex flex-col space-y-8">
                 <h2 className="text-white text-center">Edit an action</h2>
                 <select
+                  value={selectedAction.serviceName}
                   onChange={(e) => {
                     setSelectedAction({
                       ...selectedAction,
@@ -374,7 +383,7 @@ export default function action() {
                       actionType:
                         servicesMap[
                           selectedAction.isInput ? "action" : "reaction"
-                        ][e.target.value][0],
+                        ][e.target.value][0].type,
                     });
                   }}
                   className="bg-black text-white rounded-lg p-2"
@@ -397,8 +406,8 @@ export default function action() {
                   {servicesMap[selectedAction.isInput ? "action" : "reaction"][
                     selectedAction.serviceName
                   ].map((key) => (
-                    <option key={key} value={key}>
-                      {key}
+                    <option key={key.type} value={key.type}>
+                      {key.type}
                     </option>
                   ))}
                 </select>
@@ -440,6 +449,10 @@ export default function action() {
                   </Button>
                   <Button
                     onClick={() => {
+                      services.forEach((service) => {
+                        if (service.title == selectedAction.serviceName)
+                          selectedAction.serviceId = service.id;
+                      });
                       editAction(selectedAction);
                       setShowEditPopup(false);
                     }}

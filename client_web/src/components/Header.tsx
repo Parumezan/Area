@@ -23,7 +23,7 @@ export default function Header() {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     }).then((response) => {
-      if (response.status === 401 || response.status === 403)
+      if (response.status === 401)
         alert("You somehow aren't logged-in when trying to logout");
       localStorage.removeItem("token");
       router.push("/login");
