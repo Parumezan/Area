@@ -48,7 +48,7 @@ export class ActionService {
     let service = await this.prisma.service.findFirst({
       where: { accountId: accountId, title: action.serviceName },
     });
-
+    let newArgs = [];
     if (service === null)
       service = await this.prisma.service.findFirst({
         where: { accountId: -1, title: action.serviceName },
@@ -56,12 +56,14 @@ export class ActionService {
     if (!brick) throw new HttpException('Forbidden', 403);
     if (brick.accountId !== accountId)
       throw new HttpException('Forbidden', 403);
+    if (action.arguments.length !== 0)
+      newArgs = action.arguments[0].split('|').map((arg) => arg.trim());
     return this.prisma.action.create({
       data: {
         description: action.description,
         brickId: action.brickId,
         serviceId: service.id,
-        arguments: action.arguments,
+        arguments: newArgs,
         isInput: action.isInput,
         actionType: action.actionType,
       },
@@ -106,6 +108,8 @@ export class ActionService {
     if (brick.accountId !== accountId)
       throw new HttpException('Forbidden', 403);
     delete data.serviceName;
+    if (data.arguments.length !== 0)
+      data.arguments = data.arguments[0].split('|').map((arg) => arg.trim());
     return this.prisma.action.update({
       where: { id: id },
       data: { ...data, serviceId: service.id },
@@ -124,5 +128,106 @@ export class ActionService {
     if (brick.accountId !== accountId)
       throw new HttpException('Forbidden', 403);
     return this.prisma.action.delete({ where: { id: id } });
+  }
+
+  getActionTypes() {
+    return [
+      {
+        service: 'Time',
+        isInput: true,
+        type: 'TIME_IS_X',
+        description: 'Activates when the given time is reached. 1 argument',
+      },
+      {
+        service: 'Time',
+        isInput: true,
+        type: 'DAY_IS_X_TIME_IS_Y',
+        description:
+          'Activates when the given day and time is reached. 2 arguments',
+      },
+      {
+        service: 'Crypto',
+        isInput: true,
+        type: 'CRYPTO_CHECK_PRICE',
+        description:
+          'Activates when the given crypto price is reached. 2 arguments',
+      },
+      {
+        service: 'OnePiece',
+        isInput: true,
+        type: 'ONE_PIECE_GET_NEW_EP',
+        description:
+          'Activates when a new One Piece episode is released. 0 arguments',
+      },
+      {
+        service: 'Twitch',
+        isInput: true,
+        type: 'DETECT_STREAMERS_PLAY_GAMES_TWITCH',
+        description:
+          'Activates when the given streamers are playing the given games. 2 arguments',
+      },
+      {
+        service: 'Twitch',
+        isInput: true,
+        type: 'DETECT_USER_STREAM_GAMES_TWITCH',
+        description:
+          'Activates when the given user is streaming the given game. 2 arguments',
+      },
+      {
+        service: 'Twitter',
+        isInput: true,
+        type: 'GET_TWEETS_FROM_USER',
+        description: 'Activates when the given user tweets. 1 argument',
+      },
+      {
+        service: 'Weather',
+        isInput: true,
+        type: 'WEATHER_BY_CITY',
+        description:
+          'Activates when the weather in the given city is the given weather. 2 arguments',
+      },
+      {
+        service: 'Twitch',
+        isInput: false,
+        type: 'SEND_WHISPERS_TWITCH',
+        description: 'Sends a whisper to the given user. 2 arguments',
+      },
+      {
+        service: 'Twitch',
+        isInput: false,
+        type: 'BLOCK_USER_TWITCH',
+        description: 'Blocks the given user. 1 argument',
+      },
+      {
+        service: 'Twitch',
+        isInput: false,
+        type: 'UNBLOCK_USER_TWITCH',
+        description: 'Unblocks the given user. 1 argument',
+      },
+      {
+        service: 'Twitter',
+        isInput: false,
+        type: 'POST_TWEET_FROM_BOT',
+        description: 'Posts a tweet from the bot. 1 argument',
+      },
+      {
+        service: 'Twitter',
+        isInput: false,
+        type: 'LIKE_TWEET',
+        description: 'Likes the given tweet. 1 argument',
+      },
+      {
+        service: 'Twitter',
+        isInput: false,
+        type: 'RETWEET_TWEET',
+        description: 'Retweets the given tweet. 1 argument',
+      },
+      {
+        service: 'Twitter',
+        isInput: false,
+        type: 'COMMENT_TWEET',
+        description: 'Comments the given tweet. 2 arguments',
+      },
+    ];
   }
 }

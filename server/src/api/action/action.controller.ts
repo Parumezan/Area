@@ -80,6 +80,18 @@ export class ActionController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Get('/types')
+  @ApiOperation({
+    summary: 'Get all action types',
+    description: 'Returns an array of all action types.',
+  })
+  @ApiBearerAuth()
+  @ApiResponse({ type: String })
+  getActionTypes() {
+    return this.actionService.getActionTypes();
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   @ApiOperation({
     summary: 'Get an action',

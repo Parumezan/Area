@@ -31,7 +31,9 @@ export class TwitchController {
     },
   })
   async twitchCallback(@Body() body, @Req() req): Promise<string> {
+    console.log(body);
     const tokens = await this.twitchService.getTwitchAccessToken(body.code);
+    console.log(tokens);
     this.twitchService.addTokenToDatabase(tokens, req.user.id);
     return 'Success';
   }

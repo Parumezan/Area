@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Action, ActionType, PrismaClient } from '@prisma/client';
-import { TwitterService } from 'src/services/twitter/twitter.service';
-import { TwitchService } from 'src/services/twitch/twitch.service';
+import { TwitterService } from '../services/twitter/twitter.service';
+import { TwitchService } from '../services/twitch/twitch.service';
 
 @Injectable()
 export class LinkerService {
@@ -45,6 +45,13 @@ export class LinkerService {
                   case ActionType.LIKE_TWEET:
                     action.arguments = listArg;
                     TwitterService.prototype.action_LIKE_TWEET(action, prisma);
+                    break;
+                  case ActionType.SEND_PRIVATE_MESSAGE_TWITTER:
+                    action.arguments = listArg;
+                    TwitterService.prototype.action_SEND_PRIVATE_MESSAGE(
+                      action,
+                      prisma,
+                    );
                     break;
                   case ActionType.SEND_WHISPERS_TWITCH:
                     action.arguments = listArg;

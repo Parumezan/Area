@@ -4,7 +4,7 @@ import { BaseService } from '../base/base.service';
 import axios, { AxiosRequestConfig } from 'axios';
 import { Action, ActionType } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
-import { LinkerService } from 'src/linker/linker.service';
+import { LinkerService } from '../../linker/linker.service';
 
 @Injectable()
 export class TwitchService extends BaseService {
@@ -16,6 +16,7 @@ export class TwitchService extends BaseService {
 
   async getTwitchAccessToken(code: string) {
     try {
+      console.log(process.env.TWITCH_CALLBACK_URL + '_twitter');
       const response = await axios.post('https://id.twitch.tv/oauth2/token', {
         client_id: process.env.TWITCH_CLIENT_ID,
         client_secret: process.env.TWITCH_CLIENT_SECRET,
@@ -64,6 +65,7 @@ export class TwitchService extends BaseService {
       },
     });
     if (service.length == 0) {
+      console.log('Error getting authenticated user ID:', token);
       await this.prisma.service.create({
         data: {
           title: 'Twitch',
@@ -220,6 +222,12 @@ export class TwitchService extends BaseService {
     };
     const twitchApiUrl = 'https://api.twitch.tv/helix';
     for (let i = 0; i < action.arguments.length; i++) {
+      if (/^\d+$/.test(action.arguments[i]) == false) {
+        action.arguments[i] = await this.getUserId(
+          action.arguments[i],
+          service.serviceToken,
+        );
+      }
       const options: AxiosRequestConfig = {
         method: 'PUT',
         url: `${twitchApiUrl}/users/blocks`,
@@ -253,6 +261,12 @@ export class TwitchService extends BaseService {
       Authorization: `Bearer ${service.serviceToken}`,
     };
     for (let i = 0; i < action.arguments.length; i++) {
+      if (/^\d+$/.test(action.arguments[i]) == false) {
+        action.arguments[i] = await this.getUserId(
+          action.arguments[i],
+          service.serviceToken,
+        );
+      }
       const options: AxiosRequestConfig = {
         method: 'DELETE',
         url: `${this.twitchApiUrl}/users/blocks`,
@@ -300,15 +314,34 @@ export class TwitchService extends BaseService {
     try {
       const response = await axios(options);
       if (response.status !== 200) return;
+      if (response.data.data.length == 0) {
+        this.prisma.action.update({
+          where: { id: action.id },
+          data: { arguments: [username, game, 'false'] },
+        });
+        return;
+      }
       if (
-        response.data.data.length > 0 &&
-        response.data.data[0].game_id === game
+        response.data.data[0].game_id === game &&
+        (action.arguments.length < 3 || action.arguments[2] === 'false')
       ) {
+        this.prisma.action.update({
+          where: { id: action.id },
+          data: { arguments: [username, game, 'true'] },
+        });
         this.linkerService.execAllFromAction(
           action,
           [username, game],
           this.prisma,
         );
+      } else if (
+        action.arguments.length < 3 ||
+        action.arguments[2] === 'true'
+      ) {
+        this.prisma.action.update({
+          where: { id: action.id },
+          data: { arguments: [username, game, 'false'] },
+        });
       }
     } catch (error) {
       console.log('Error detecting stream:', error.response.data);

@@ -31,11 +31,15 @@ export class OnePieceService extends BaseService {
               case ActionType.ONE_PIECE_GET_NEW_EP:
                 this.action_ONE_PIECE_GET_NEW_EP(action);
                 break;
+              case ActionType.ONE_PIECE_GET_NEW_MANGA:
+                this.action_ONE_PIECE_GET_NEW_MANGA(action);
+                break;
             }
           }
         });
       });
   }
+
   async action_ONE_PIECE_GET_NEW_EP(action: Action) {
     const response = await axios.get(
       'https://api.api-onepiece.com/episodes/count',
@@ -68,6 +72,45 @@ export class OnePieceService extends BaseService {
         action,
         [
           `Le dernier épisode de One Piece vient de sortir, c'est le ${info.data.episode} intitulé ${info.data.title}.`,
+        ],
+        this.prisma,
+      );
+    }
+    return;
+  }
+
+  async action_ONE_PIECE_GET_NEW_MANGA(action: Action) {
+    const response = await axios.get(
+      'https://api.api-onepiece.com/tomes/count',
+    );
+    if (response.status === 200) return;
+    if (action.arguments.length == 0) {
+      this.prisma.action.update({
+        where: {
+          id: action.id,
+        },
+        data: {
+          arguments: [response.data],
+        },
+      });
+      return;
+    } else if (action.arguments[0] == response.data) return;
+    const info = await axios.get(
+      'https://api.api-onepiece.com/tomes/' + response.data,
+    );
+    if (info.status === 200) {
+      this.prisma.action.update({
+        where: {
+          id: action.id,
+        },
+        data: {
+          arguments: [response.data.episode],
+        },
+      });
+      this.linkerService.execAllFromAction(
+        action,
+        [
+          `Le dernier tome de One Piece vient de sortir, c'est le ${info.data.episode} intitulé ${info.data.title}.`,
         ],
         this.prisma,
       );

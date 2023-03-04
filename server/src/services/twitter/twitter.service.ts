@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { LinkerService } from 'src/linker/linker.service';
+import { LinkerService } from '../../linker/linker.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { BaseService } from '../base/base.service';
 import * as OAuth from 'oauth';
@@ -38,7 +38,7 @@ export class TwitterService extends BaseService {
     env.OAUTH2_REDIRECT_URI + '_twitter',
     'HMAC-SHA1',
   );
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_MINUTE)
   handleCron() {
     this.prisma.service
       .findMany({
@@ -169,8 +169,26 @@ export class TwitterService extends BaseService {
       count: 1,
     });
     if (tweet.data.length == 0) return;
-    if (action.arguments.length < 2) action.arguments.push(tweet.data[0]?.text);
+    if (action.arguments.length < 2) {
+      action.arguments.push(tweet.data[0]?.text);
+      this.prisma.action.update({
+        where: {
+          id: action.id,
+        },
+        data: {
+          arguments: action.arguments,
+        },
+      });
+    }
     if (action.arguments[1] == tweet.data[0]?.text) return;
+    this.prisma.action.update({
+      where: {
+        id: action.id,
+      },
+      data: {
+        arguments: [action.arguments[0], tweet.data[0]?.text],
+      },
+    });
     this.linkerService.execAllFromAction(
       action,
       [tweet.data[0]?.text],
@@ -280,6 +298,61 @@ export class TwitterService extends BaseService {
           console.error(err);
         } else {
           console.log(`Successfully commented on tweet: ${tweetID}`);
+        }
+      },
+    );
+  }
+
+  getIdByUsername(username: string) {
+    const T = new Twit({
+      consumer_key: env.TWITTER_CONSUMER_KEY,
+      consumer_secret: env.TWITTER_CONSUMER_SECRET,
+    });
+    T.get('users/lookup', { screen_name: username }, (err, data, response) => {
+      if (err) {
+        console.error(err);
+      } else {
+        return data[0].id_str;
+      }
+    });
+  }
+
+  async action_SEND_PRIVATE_MESSAGE(action: Action, prisma: PrismaClient) {
+    const service = await prisma.service.findFirst({
+      where: {
+        id: action.serviceId,
+      },
+    });
+    const T = new Twit({
+      consumer_key: env.TWITTER_CONSUMER_KEY,
+      consumer_secret: env.TWITTER_CONSUMER_SECRET,
+      access_token: service.serviceToken,
+      access_token_secret: service.serviceTokenSecret,
+    });
+    const recipient = this.getIdByUsername(action.arguments[0]);
+    const message = action.arguments[1];
+    T.post(
+      'direct_messages/events/new',
+      {
+        event: {
+          type: 'message_create',
+          message_create: {
+            target: {
+              recipient_id: recipient,
+            },
+            message_data: {
+              text: message,
+            },
+          },
+        },
+      },
+      (err, data, response) => {
+        if (err) {
+          console.error(err);
+          return null;
+        } else {
+          console.log(`Successfully sent private message to ${recipient}`);
+          return recipient;
         }
       },
     );
