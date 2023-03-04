@@ -52,7 +52,8 @@ export class ClockService extends BaseService {
         ) {
           LinkerService.prototype.execAllFromAction(action, [], this.prisma);
         }
-      });
+      })
+      .catch((err) => console.log(err));
   }
 
   async action_DAY_IS_X_TIME_IS_Y(action: Action) {
@@ -86,6 +87,7 @@ export class ClockService extends BaseService {
         ) {
           LinkerService.prototype.execAllFromAction(action, [], this.prisma);
         }
-      });
+      })
+      .catch((err) => console.log(err));
   }
 }

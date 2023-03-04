@@ -84,21 +84,22 @@ export class AuthService {
       }&redirect_uri=${encodeURIComponent(
         process.env.OAUTH2_REDIRECT_URI + '_google',
       )}&grant_type=authorization_code`,
-    });
-    const json = await response.json();
-    return json;
+    })
+      .then((res) => res.json())
+      .catch((err) => console.log(err));
+    return response;
   }
 
   async oauthGoogle(user: OauthGoogleDto) {
-    const data = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+    const json = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/http',
         Authorization: `Bearer ${user.oauthToken}`,
       },
-    });
-    const response = await data.text();
-    const json = JSON.parse(response);
+    })
+      .then((res) => res.json())
+      .catch((err) => console.log(err));
 
     const userId = await this.prisma.account.findUnique({
       where: { email: json.email },
