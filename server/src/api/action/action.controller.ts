@@ -76,6 +76,7 @@ export class ActionController {
   @ApiBearerAuth()
   @ApiResponse({ type: UpdateActionDto })
   createAction(@Req() req: any, @Body() body: CreateActionDto) {
+    console.log('body', body);
     return this.actionService.createAction(req.user.id, body);
   }
 

@@ -30,9 +30,14 @@ export class BrickService {
     const brick = await this.prisma.brick.findUnique({
       where: { id: id },
     });
-    if (!brick) throw new HttpException('Forbidden', 403);
-    if (brick.accountId !== accountId)
-      throw new HttpException('Forbidden', 403);
+    if (!brick) {
+      console.log('No brick found');
+      return null;
+    }
+    if (brick.accountId !== accountId) {
+      console.log('Forbidden');
+      return null;
+    }
     return brick;
   }
 
@@ -44,9 +49,14 @@ export class BrickService {
     const brick = await this.prisma.brick.findUnique({
       where: { id: id },
     });
-    if (!brick) throw new HttpException('Forbidden', 403);
-    if (brick.accountId !== accountId)
-      throw new HttpException('Forbidden', 403);
+    if (!brick) {
+      console.log('No brick found');
+      return null;
+    }
+    if (brick.accountId !== accountId) {
+      console.log('Forbidden');
+      return null;
+    }
     return this.prisma.brick.update({
       where: { id: id },
       data: data,
@@ -57,9 +67,14 @@ export class BrickService {
     const brick = await this.prisma.brick.findUnique({
       where: { id: id },
     });
-    if (!brick) throw new HttpException('Forbidden', 403);
-    if (brick.accountId !== accountId)
-      throw new HttpException('Forbidden', 403);
+    if (!brick) {
+      console.log('No brick found');
+      return null;
+    }
+    if (brick.accountId !== accountId) {
+      console.log('Forbidden');
+      return null;
+    }
     return this.prisma.brick.delete({ where: { id: id } });
   }
 }

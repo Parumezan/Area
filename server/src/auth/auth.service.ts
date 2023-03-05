@@ -33,7 +33,8 @@ export class AuthService {
   async login(user: LoginDto) {
     const DBuser = await this.validateUser(user.email, user.password);
     if (!DBuser) {
-      throw new HttpException('Forbidden', 403);
+      console.log('Forbidden');
+      return null;
     }
     return {
       access_token: this.jwtService.sign({

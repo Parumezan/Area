@@ -25,8 +25,14 @@ export class CryptoService extends BaseService {
         },
       })
       .then((actions: Action[]) => {
-        actions.forEach((action: Action) => {
-          if (action.isInput === true)
+        actions.forEach(async (action: Action) => {
+          if (
+            (await this.prisma.brick.findFirst({
+              where: { id: action.brickId, active: true },
+            })) === null
+          ) {
+            console.log('brick not active');
+          } else if (action.isInput === true)
             switch (action.actionType) {
               case ActionType.CRYPTO_CHECK_PRICE_UP:
                 this.action_CRYPTO_CHECK_PRICE_UP(action);
@@ -56,13 +62,9 @@ export class CryptoService extends BaseService {
     const data = response.data.data.BTC;
     const price = data.quote.USD.price;
     if (action.arguments[1] <= price.toString()) return;
-    this.prisma.action.update({
-      where: {
-        id: action.id,
-      },
-      data: {
-        arguments: [action.arguments[0], price.toString()],
-      },
+    await this.prisma.action.update({
+      where: { id: action.id },
+      data: { arguments: [action.arguments[0], price.toString()] },
     });
     this.linkerService.execAllFromAction(
       action,
@@ -88,13 +90,9 @@ export class CryptoService extends BaseService {
     const data = response.data.data.BTC;
     const price = data.quote.USD.price;
     if (action.arguments[1] >= price.toString()) return;
-    this.prisma.action.update({
-      where: {
-        id: action.id,
-      },
-      data: {
-        arguments: [action.arguments[0], price.toString()],
-      },
+    await this.prisma.action.update({
+      where: { id: action.id },
+      data: { arguments: [action.arguments[0], price.toString()] },
     });
     this.linkerService.execAllFromAction(
       action,

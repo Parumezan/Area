@@ -40,9 +40,14 @@ export class ServiceService {
     const service = await this.prisma.service.findUnique({
       where: { id: id },
     });
-    if (!service) throw new HttpException('Forbidden', 403);
-    if (service.accountId !== accountId)
-      throw new HttpException('Forbidden', 403);
+    if (!service) {
+      console.log('No service found');
+      return null;
+    }
+    if (service.accountId !== accountId) {
+      console.log('Forbidden');
+      return null;
+    }
     return service;
   }
 
@@ -54,9 +59,14 @@ export class ServiceService {
     const service = await this.prisma.service.findUnique({
       where: { id: id },
     });
-    if (!service) throw new HttpException('Forbidden', 403);
-    if (service.accountId !== accountId)
-      throw new HttpException('Forbidden', 403);
+    if (!service) {
+      console.log('No service found');
+      return null;
+    }
+    if (service.accountId !== accountId) {
+      console.log('Forbidden');
+      return null;
+    }
     return this.prisma.service.update({
       where: { id: id },
       data: data,
@@ -67,9 +77,14 @@ export class ServiceService {
     const service = await this.prisma.service.findUnique({
       where: { id: id },
     });
-    if (!service) throw new HttpException('Forbidden', 403);
-    if (service.accountId !== accountId)
-      throw new HttpException('Forbidden', 403);
+    if (!service) {
+      console.log('No service found');
+      return null;
+    }
+    if (service.accountId !== accountId) {
+      console.log('Forbidden');
+      return null;
+    }
     return this.prisma.service.delete({ where: { id: id } });
   }
 }

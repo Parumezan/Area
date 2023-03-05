@@ -19,8 +19,14 @@ export class ClockService extends BaseService {
         },
       })
       .then((actions: Action[]) => {
-        actions.forEach((action: Action) => {
-          if (action.isInput === true)
+        actions.forEach(async (action: Action) => {
+          if (
+            (await this.prisma.brick.findFirst({
+              where: { id: action.brickId, active: true },
+            })) === null
+          ) {
+            console.log('brick not active');
+          } else if (action.isInput === true)
             switch (action.actionType) {
               case ActionType.TIME_IS_X:
                 this.action_TIME_IS_X(action);

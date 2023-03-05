@@ -12,6 +12,8 @@ export const servicesMap: {
   action: {
     Time: {
       TIME_IS_X: "Activates when the time is X (1 argument, ex: 12:00)",
+      DAY_IS_X_TIME_IS_Y:
+        "Activates when the time is X and the time is Y (2 arguments, ex: Monday|12:00)",
     },
     Crypto: {
       CRYPTO_CHECK_PRICE_UP:
@@ -58,7 +60,7 @@ export const servicesMap: {
         "Retweet a tweet with a given tweet id (1 non-user argument, the tweet id comes from a GET_TWEETS_FROM_USER)",
       COMMENT_TWEET:
         "Comment on a tweet with a given tweet id (1 non-user argument, the tweet id comes from a GET_TWEETS_FROM_USER)",
-      SEND_PRIVATE_MESSAGE:
+      SEND_PRIVATE_MESSAGE_TWITTER:
         "Send a private message to a given user (2 arguments, ex: artototototo|*explodes your laptop battery*)",
     },
   },

@@ -150,6 +150,9 @@ export default function action() {
         <div className="w-full h-full flex flex-row">
           <div className="w-1/2 h-full flex flex-col justify-between">
             <div className="flex flex-col space-y-5 w-full h-full p-4">
+              <div className="p-2 backdrop-blur-sm bg-opacity-75 bg-gray-800 border border-black rounded-2xl hover:bg-opacity-80">
+                <h2 className="text-white text-center">actions</h2>
+              </div>
               {actions.map((action: ActionProps, index: number) => {
                 if (action.isInput == true) {
                   return (
@@ -218,6 +221,9 @@ export default function action() {
 
           <div className="w-1/2 h-full flex flex-col justify-between">
             <div className="flex flex-col space-y-5 w-full h-full p-4">
+              <div className="p-2 backdrop-blur-sm bg-opacity-75 bg-gray-800 border border-black rounded-2xl hover:bg-opacity-80">
+                <h2 className="text-white text-center">reactions</h2>
+              </div>
               {actions.map((action: ActionProps, index: number) => {
                 if (action.isInput == false) {
                   return (
@@ -405,6 +411,7 @@ export default function action() {
                   ))}
                 </select>
                 <select
+                  value={selectedAction.actionType}
                   onChange={(e) => {
                     setSelectedAction({
                       ...selectedAction,
@@ -424,7 +431,9 @@ export default function action() {
                   ))}
                 </select>
                 <input
-                  value={selectedAction.arguments}
+                  value={selectedAction.arguments
+                    .map((arg) => arg.replace(/,/g, "|"))
+                    .join("|")} //:skull:
                   placeholder="Arguments separated by |"
                   type="text"
                   className="bg-black text-white rounded-lg p-2"

@@ -11,7 +11,10 @@ export class ActionService {
     const brick = await this.prisma.brick.findMany({
       where: { accountId: accountId },
     });
-    if (!brick) throw new HttpException('Forbidden', 403);
+    if (!brick) {
+      console.log('No brick found');
+      return [];
+    }
     return this.prisma.action.findMany({
       where: {
         brickId: {
@@ -28,9 +31,14 @@ export class ActionService {
     const brick = await this.prisma.brick.findUnique({
       where: { id: brickId },
     });
-    if (!brick) throw new HttpException('Forbidden', 403);
-    if (brick.accountId !== accountId)
-      throw new HttpException('Forbidden', 403);
+    if (!brick) {
+      console.log('No brick found');
+      return [];
+    }
+    if (brick.accountId !== accountId) {
+      console.log('Forbidden');
+      return [];
+    }
     return this.prisma.action.findMany({
       where: {
         brickId: brickId,
@@ -53,9 +61,14 @@ export class ActionService {
       service = await this.prisma.service.findFirst({
         where: { accountId: -1, title: action.serviceName },
       });
-    if (!brick) throw new HttpException('Forbidden', 403);
-    if (brick.accountId !== accountId)
-      throw new HttpException('Forbidden', 403);
+    if (!brick) {
+      console.log('No brick found');
+      return;
+    }
+    if (brick.accountId !== accountId) {
+      console.log('Forbidden');
+      return;
+    }
     if (action.arguments.length !== 0)
       newArgs = action.arguments[0].split('|').map((arg) => arg.trim());
     return this.prisma.action.create({
@@ -74,13 +87,21 @@ export class ActionService {
     const action = await this.prisma.action.findUnique({
       where: { id: id },
     });
-    if (!action) throw new HttpException('Forbidden', 403);
+    if (!action) {
+      console.log('No action found');
+      return;
+    }
     const brick = await this.prisma.brick.findUnique({
       where: { id: action.brickId },
     });
-    if (!brick) throw new HttpException('Forbidden', 403);
-    if (brick.accountId !== accountId)
-      throw new HttpException('Forbidden', 403);
+    if (!brick) {
+      console.log('No brick found');
+      return;
+    }
+    if (brick.accountId !== accountId) {
+      console.log('Forbidden');
+      return;
+    }
     return action;
   }
 
@@ -92,7 +113,10 @@ export class ActionService {
     const action = await this.prisma.action.findUnique({
       where: { id: id },
     });
-    if (!action) throw new HttpException('Forbidden', 403);
+    if (!action) {
+      console.log('No action found');
+      return;
+    }
     let service = await this.prisma.service.findFirst({
       where: { accountId: accountId, title: data.serviceName },
     });
@@ -104,9 +128,14 @@ export class ActionService {
     const brick = await this.prisma.brick.findUnique({
       where: { id: action.brickId },
     });
-    if (!brick) throw new HttpException('Forbidden', 403);
-    if (brick.accountId !== accountId)
-      throw new HttpException('Forbidden', 403);
+    if (!brick) {
+      console.log('No brick found');
+      return;
+    }
+    if (brick.accountId !== accountId) {
+      console.log('Forbidden');
+      return;
+    }
     delete data.serviceName;
     if (data.arguments.length !== 0)
       data.arguments = data.arguments[0].split('|').map((arg) => arg.trim());
@@ -120,13 +149,21 @@ export class ActionService {
     const action = await this.prisma.action.findUnique({
       where: { id: id },
     });
-    if (!action) throw new HttpException('Forbidden', 403);
+    if (!action) {
+      console.log('No action found');
+      return;
+    }
     const brick = await this.prisma.brick.findUnique({
       where: { id: action.brickId },
     });
-    if (!brick) throw new HttpException('Forbidden', 403);
-    if (brick.accountId !== accountId)
-      throw new HttpException('Forbidden', 403);
+    if (!brick) {
+      console.log('No brick found');
+      return;
+    }
+    if (brick.accountId !== accountId) {
+      console.log('Forbidden');
+      return;
+    }
     return this.prisma.action.delete({ where: { id: id } });
   }
 
