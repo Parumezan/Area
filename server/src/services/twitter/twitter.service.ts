@@ -315,7 +315,12 @@ export class TwitterService extends BaseService {
   }
 
   async getIdByUsername(username: string, T: Twit) {
-    return await T.get('users/lookup', { screen_name: username });
+    try {
+      return await T.get('users/lookup', { screen_name: username });
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
   }
 
   async action_SEND_PRIVATE_MESSAGE(action: Action, prisma: PrismaClient) {
@@ -347,6 +352,7 @@ export class TwitterService extends BaseService {
         },
       });
     }
+    console.log(action.arguments);
     await T.post(
       'direct_messages/events/new',
       {

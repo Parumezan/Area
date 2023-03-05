@@ -185,7 +185,14 @@ export class ActionService {
       {
         service: 'Crypto',
         isInput: true,
-        type: 'CRYPTO_CHECK_PRICE',
+        type: 'CRYPTO_CHECK_PRICE_UP',
+        description:
+          'Activates when the given crypto price is reached. 2 arguments',
+      },
+      {
+        service: 'Crypto',
+        isInput: true,
+        type: 'CRYPTO_CHECK_PRICE_DOWN',
         description:
           'Activates when the given crypto price is reached. 2 arguments',
       },
@@ -195,6 +202,13 @@ export class ActionService {
         type: 'ONE_PIECE_GET_NEW_EP',
         description:
           'Activates when a new One Piece episode is released. 0 arguments',
+      },
+      {
+        service: 'OnePiece',
+        isInput: true,
+        type: 'ONE_PIECE_GET_NEW_MANGE',
+        description:
+          'Activates when a new One Piece manga is released. 0 arguments',
       },
       {
         service: 'Twitch',
@@ -219,7 +233,14 @@ export class ActionService {
       {
         service: 'Weather',
         isInput: true,
-        type: 'WEATHER_BY_CITY',
+        type: 'WEATHER_BY_CITY_UP',
+        description:
+          'Activates when the weather in the given city is above the given weather. 2 arguments',
+      },
+      {
+        service: 'Weather',
+        isInput: true,
+        type: 'WEATHER_BY_CITY_DOWN',
         description:
           'Activates when the weather in the given city is the given weather. 2 arguments',
       },
@@ -264,6 +285,12 @@ export class ActionService {
         isInput: false,
         type: 'COMMENT_TWEET',
         description: 'Comments the given tweet. 2 arguments',
+      },
+      {
+        service: 'Twitter',
+        isInput: false,
+        type: 'SEND_PRIVATE_MESSAGE_TWITTER',
+        description: 'Sends a private message to the given user. 2 arguments',
       },
     ];
   }

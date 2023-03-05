@@ -16,7 +16,6 @@ export class TwitchService extends BaseService {
 
   async getTwitchAccessToken(code: string) {
     try {
-      console.log(process.env.TWITCH_CALLBACK_URL + '_twitter');
       const response = await axios.post('https://id.twitch.tv/oauth2/token', {
         client_id: process.env.TWITCH_CLIENT_ID,
         client_secret: process.env.TWITCH_CLIENT_SECRET,
@@ -70,26 +69,30 @@ export class TwitchService extends BaseService {
         title: 'Twitch',
       },
     });
-    if (service.length == 0) {
-      console.log('Error getting authenticated user ID:', token);
-      await this.prisma.service.create({
-        data: {
-          title: 'Twitch',
-          accountId: userId,
-          serviceToken: token.access_token,
-          serviceTokenSecret: token.refresh_token,
-        },
-      });
-    } else {
-      await this.prisma.service.update({
-        where: {
-          id: service[0].id,
-        },
-        data: {
-          serviceToken: token.access_token,
-          serviceTokenSecret: token.refresh_token,
-        },
-      });
+    try {
+      if (service.length == 0) {
+        console.log('Error getting authenticated user ID:', token);
+        await this.prisma.service.create({
+          data: {
+            title: 'Twitch',
+            accountId: userId,
+            serviceToken: token.access_token,
+            serviceTokenSecret: token.refresh_token,
+          },
+        });
+      } else {
+        await this.prisma.service.update({
+          where: {
+            id: service[0].id,
+          },
+          data: {
+            serviceToken: token.access_token,
+            serviceTokenSecret: token.refresh_token,
+          },
+        });
+      }
+    } catch (error) {
+      console.log('Error getting authenticated user ID:', error);
     }
   }
 
@@ -145,7 +148,7 @@ export class TwitchService extends BaseService {
       return authenticatedUser.id;
     } catch (error) {
       if (error.response.status == 401) {
-        let serv = await this.prisma.service.findFirst({
+        const serv = await this.prisma.service.findFirst({
           where: {
             title: 'Twitch',
             serviceToken: authToken,
@@ -180,7 +183,7 @@ export class TwitchService extends BaseService {
       return userId;
     } catch (error) {
       if (error.response.status == 401) {
-        let serv = await this.prisma.service.findFirst({
+        const serv = await this.prisma.service.findFirst({
           where: {
             title: 'Twitch',
             serviceToken: authToken,
@@ -217,7 +220,7 @@ export class TwitchService extends BaseService {
     } catch (error) {
       if (error.response.status == 401) {
         console.log('Error getting game ID:', error.response.data);
-        let serv = await this.prisma.service.findFirst({
+        const serv = await this.prisma.service.findFirst({
           where: {
             title: 'Twitch',
             serviceToken: authToken,
@@ -304,7 +307,7 @@ export class TwitchService extends BaseService {
         broadcaster_id: userId,
       },
     };
-    let blockList = [];
+    const blockList = [];
     try {
       const response = await axios(options);
       if (response.status === 200) console.log('Request was successful!');
@@ -368,7 +371,7 @@ export class TwitchService extends BaseService {
         broadcaster_id: userId,
       },
     };
-    let blockList = [];
+    const blockList = [];
     try {
       const response = await axios(options);
       if (response.status === 200) console.log('Request was successful!');
@@ -495,7 +498,7 @@ export class TwitchService extends BaseService {
       'Client-ID': process.env.TWITCH_CLIENT_ID,
       Authorization: `Bearer ${service.serviceToken}`,
     };
-    let listUsers: string[] = [];
+    const listUsers: string[] = [];
     const twitchApiUrl = 'https://api.twitch.tv/helix';
     const params = {
       game_id: game,

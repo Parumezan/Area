@@ -13,7 +13,7 @@ import {
 export class TwitterController {
   constructor(private readonly twitterService: TwitterService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  //   @UseGuards(AuthGuard('jwt'))
   @Get('requestToken')
   @ApiOperation({
     summary: 'Get twitter token',
