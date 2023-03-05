@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect, useNavigation, useRoute} from '@react-navigation/core';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Button, Text} from '@rneui/themed';

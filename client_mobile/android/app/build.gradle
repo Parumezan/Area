@@ -101,7 +101,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        manifestPlaceholders = [appAuthRedirectScheme: 'com.redirectScheme.comm']
+        manifestPlaceholders = [appAuthRedirectScheme: 'http']
     }
 
     splits {

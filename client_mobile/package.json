@@ -31,6 +31,7 @@
     "react-native-svg": "^13.8.0",
     "react-native-system-navigation-bar": "^2.2.0",
     "react-native-vector-icons": "^9.2.0",
+    "react-native-webview": "^11.26.1",
     "tailwind-rn": "^4.2.0"
   },
   "devDependencies": {

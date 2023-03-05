@@ -45,6 +45,11 @@
 			"marginBottom": "auto"
 		}
 	},
+	"mb-5": {
+		"style": {
+			"marginBottom": 20
+		}
+	},
 	"flex": {
 		"style": {
 			"display": "flex"

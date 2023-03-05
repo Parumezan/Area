@@ -33,6 +33,10 @@
   margin-bottom: auto
 }
 
+.mb-5 {
+  margin-bottom: 1.25rem
+}
+
 .flex {
   display: flex
 }

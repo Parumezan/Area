@@ -23,11 +23,11 @@ export default function Services() {
   const navigation = useNavigation<ServicesNavigationProp>();
 
   async function twitterLogin() {
-    // do it
+    navigation.navigate('TwitterLogin');
   }
 
   async function twitchLogin() {
-    // do it
+    navigation.navigate('TwitchLogin');
   }
 
   const services: Service[] = [

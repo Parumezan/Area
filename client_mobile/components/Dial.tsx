@@ -61,8 +61,8 @@ export default function Dial(props: DialProps) {
     setLocalApiUrl();
   }
 
-  function logout() {
-    AsyncStorage.removeItem('@apiToken');
+  async function logout() {
+    await AsyncStorage.removeItem('@apiToken');
     navigation.navigate('Login');
   }
 

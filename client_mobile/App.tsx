@@ -12,6 +12,9 @@ import BrickEdit from './pages/brickEdit';
 import Services from './pages/services';
 import Actions from './pages/actions';
 import ActionsEdit from './pages/actionsEdit';
+import TwitterLogin from './pages/twitterLogin';
+import TwitchLogin from './pages/twitchLogin';
+import GoogleLogin from './pages/googleLogin';
 
 const RootStack = createStackNavigator<RootStackParamList>();
 
@@ -27,6 +30,9 @@ export default function App() {
           <RootStack.Screen name="BrickEdit" component={BrickEdit} />
           <RootStack.Screen name="Actions" component={Actions} />
           <RootStack.Screen name="ActionsEdit" component={ActionsEdit} />
+          <RootStack.Screen name="TwitterLogin" component={TwitterLogin} />
+          <RootStack.Screen name="TwitchLogin" component={TwitchLogin} />
+          <RootStack.Screen name="GoogleLogin" component={GoogleLogin} />
         </RootStack.Navigator>
       </NavigationContainer>
     </TailwindProvider>

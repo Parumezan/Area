@@ -14,6 +14,7 @@ import Dial from '../components/Dial';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RootStackParamList} from '../types/RootStackParamList';
 import Error from '../components/Error';
+import GoogleSign from '../components/GoogleSign';
 
 type RegisterNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -123,7 +124,7 @@ export default function Register() {
           </View>
           <View style={tw('flex flex-col px-10 justify-around')}>
             <Button
-              style={tw('bg-blue-600 text-white rounded-md')}
+              buttonStyle={tw('bg-blue-600 text-white rounded-md')}
               onPress={onSignUpButtonPress}>
               {loading && (
                 <ActivityIndicator
@@ -134,18 +135,19 @@ export default function Register() {
               )}
               SIGN UP
             </Button>
-            <View style={tw('flex flex-row justify-center')}>
+            <View style={tw('flex flex-row justify-center mb-5')}>
               <Text style={tw('text-white text-lg text-center my-auto')}>
                 Already have an account ?
               </Text>
               <Button
-                style={tw('text-white text-lg text-center my-auto')}
+                buttonStyle={tw('text-white text-lg text-center my-auto')}
                 type="clear"
                 onPress={onSignInButtonPress}>
                 Sign In
               </Button>
             </View>
           </View>
+          <GoogleSign navigator={navigation} />
         </View>
         <Dial state="connection" />
       </KeyboardAvoidingView>

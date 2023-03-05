@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
-import {useTailwind} from 'tailwind-rn/dist';
 import {RootStackParamList} from '../types/RootStackParamList';
+import {useTailwind} from 'tailwind-rn/dist';
 import {
   ActivityIndicator,
   ImageBackground,
@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import Dial from '../components/Dial';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Error from '../components/Error';
+import GoogleSign from '../components/GoogleSign';
 
 type LoginNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -120,7 +121,7 @@ export default function Login() {
           </View>
           <View style={tw('flex flex-col px-10 justify-around')}>
             <Button
-              style={tw('bg-blue-600 text-white rounded-md')}
+              buttonStyle={tw('bg-blue-600 text-white rounded-md')}
               onPress={onSignInButtonPress}>
               {loading && (
                 <ActivityIndicator
@@ -131,7 +132,7 @@ export default function Login() {
               )}
               SIGN IN
             </Button>
-            <View style={tw('flex flex-row justify-center')}>
+            <View style={tw('flex flex-row justify-center mb-5')}>
               <Text style={tw('text-white text-lg text-center my-auto')}>
                 Don't have an account ?
               </Text>
@@ -142,6 +143,7 @@ export default function Login() {
                 Sign Up
               </Button>
             </View>
+            <GoogleSign navigator={navigation} />
           </View>
         </View>
         <Dial state="connection" />

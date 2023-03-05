@@ -10,5 +10,9 @@ export type RootStackParamList = {
   BrickEdit: BrickProps;
   ActionsEdit: {brickId: number} & ActionProps;
 
+  TwitterLogin: undefined;
+  TwitchLogin: undefined;
+  GoogleLogin: undefined;
+
   // Add more screens here
 };
