@@ -195,12 +195,13 @@ export default function action() {
                     onClick={() => {
                       setSelectedAction({
                         id: actions.length,
-                        serviceName: "Time",
+                        serviceName: services[0].title,
                         description: "",
                         arguments: [],
                         brickId: parseInt(router.query.id as string),
-                        serviceId: -1,
-                        actionType: "TIME_IS_X",
+                        serviceId: services[0].id,
+                        actionType:
+                          servicesMap["action"][services[0].title][0].type,
                         isInput: true,
                       });
                       setShowCreatePopup(true);
@@ -261,12 +262,13 @@ export default function action() {
                     onClick={() => {
                       setSelectedAction({
                         id: actions.length,
-                        serviceName: "",
+                        serviceName: services[0].title,
                         description: "",
                         arguments: [],
                         brickId: parseInt(router.query.id as string),
-                        serviceId: -1,
-                        actionType: "",
+                        serviceId: services[0].id,
+                        actionType:
+                          servicesMap["reaction"][services[0].title][0].type,
                         isInput: false,
                       });
                       setShowCreatePopup(true);
