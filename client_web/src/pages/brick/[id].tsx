@@ -16,6 +16,7 @@ export default function action() {
   const [actions, setActions] = useState<ActionProps[]>([]);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showCreatePopup, setShowCreatePopup] = useState(false);
+  const [showHelpPopup, setShowHelpPopup] = useState(false);
   const [selectedAction, setSelectedAction] = useState<ActionProps>();
 
   async function createAction(props: ActionProps) {
@@ -200,8 +201,9 @@ export default function action() {
                         arguments: [],
                         brickId: parseInt(router.query.id as string),
                         serviceId: services[0].id,
-                        actionType:
-                          servicesMap["action"][services[0].title][0].type,
+                        actionType: Object.keys(
+                          servicesMap["action"][services[0].title]
+                        )[0],
                         isInput: true,
                       });
                       setShowCreatePopup(true);
@@ -267,8 +269,9 @@ export default function action() {
                         arguments: [],
                         brickId: parseInt(router.query.id as string),
                         serviceId: services[0].id,
-                        actionType:
-                          servicesMap["reaction"][services[0].title][0].type,
+                        actionType: Object.keys(
+                          servicesMap["reaction"][services[0].title]
+                        )[0],
                         isInput: false,
                       });
                       setShowCreatePopup(true);
@@ -292,10 +295,11 @@ export default function action() {
                     setSelectedAction({
                       ...selectedAction,
                       serviceName: e.target.value,
-                      actionType:
+                      actionType: Object.keys(
                         servicesMap[
                           selectedAction.isInput ? "action" : "reaction"
-                        ][e.target.value][0].type,
+                        ][e.target.value]
+                      )[0],
                     });
                   }}
                   className="bg-black text-white rounded-lg p-2"
@@ -321,14 +325,15 @@ export default function action() {
                   }}
                   className="bg-black text-white rounded-lg p-2"
                 >
-                  {selectedAction.serviceName.length &&
+                  {Object.keys(
                     servicesMap[selectedAction.isInput ? "action" : "reaction"][
                       selectedAction.serviceName
-                    ].map((key) => (
-                      <option key={key.type} value={key.type}>
-                        {key.type}
-                      </option>
-                    ))}
+                    ]
+                  ).map((key) => (
+                    <option key={key} value={key}>
+                      {key}
+                    </option>
+                  ))}
                 </select>
                 <input
                   placeholder="Arguments separated by |"
@@ -340,6 +345,8 @@ export default function action() {
                       arguments: [e.target.value],
                     })
                   }
+                  onMouseOver={() => setShowHelpPopup(true)}
+                  onMouseOut={() => setShowHelpPopup(false)}
                 />
                 <input
                   placeholder="Description"
@@ -382,10 +389,11 @@ export default function action() {
                     setSelectedAction({
                       ...selectedAction,
                       serviceName: e.target.value,
-                      actionType:
+                      actionType: Object.keys(
                         servicesMap[
                           selectedAction.isInput ? "action" : "reaction"
-                        ][e.target.value][0].type,
+                        ][e.target.value]
+                      )[0],
                     });
                   }}
                   className="bg-black text-white rounded-lg p-2"
@@ -405,17 +413,19 @@ export default function action() {
                   }}
                   className="bg-black text-white rounded-lg p-2"
                 >
-                  {servicesMap[selectedAction.isInput ? "action" : "reaction"][
-                    selectedAction.serviceName
-                  ].map((key) => (
-                    <option key={key.type} value={key.type}>
-                      {key.type}
+                  {Object.keys(
+                    servicesMap[selectedAction.isInput ? "action" : "reaction"][
+                      selectedAction.serviceName
+                    ]
+                  ).map((key) => (
+                    <option key={key} value={key}>
+                      {key}
                     </option>
                   ))}
                 </select>
                 <input
                   value={selectedAction.arguments}
-                  placeholder="Argument"
+                  placeholder="Arguments separated by |"
                   type="text"
                   className="bg-black text-white rounded-lg p-2"
                   onChange={(e) =>
@@ -424,6 +434,8 @@ export default function action() {
                       arguments: [e.target.value],
                     })
                   }
+                  onMouseOver={() => setShowHelpPopup(true)}
+                  onMouseOut={() => setShowHelpPopup(false)}
                 />
                 <input
                   value={selectedAction.description}
@@ -464,6 +476,19 @@ export default function action() {
                 </div>
               </div>
             </Popup>
+          )}
+          {showHelpPopup && (
+            <div className="absolute left-[62.5%] top-2/4">
+              <div className="max-w-[50%] p-4 backdrop-blur-sm bg-opacity-75 bg-gray-800 border border-black rounded-2xl">
+                <h2 className="break-words text-white text-center">
+                  {
+                    servicesMap[selectedAction.isInput ? "action" : "reaction"][
+                      selectedAction.serviceName
+                    ][selectedAction.actionType]
+                  }
+                </h2>
+              </div>
+            </div>
           )}
         </div>
       </DefaultWrapper>
