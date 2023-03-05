@@ -1,47 +1,78 @@
-# TypeScript Next.js example
+# <p align="center">💻 Client web 🌐</p>
 
-This is a really simple project that shows the usage of Next.js with TypeScript.
+<p align="center">
+  <a href="https://en.wikipedia.org/wiki/API">
+  <img src="https://cdn.discordapp.com/attachments/1021809556625559634/1082031995611271168/image.png">
+</p>
 
-## Deploy your own
+<p align="center">
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example) or preview live with [StackBlitz](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/with-typescript)
+    [![pipeline status](https://gitlab.com/areamogus/client-mobile/badges/master/pipeline.svg)](https://gitlab.com/areamogus/client-mobile/-/pipelines?page=1&scope=branches&ref=master)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-typescript&project-name=with-typescript&repository-name=with-typescript)
+</p>
 
-## How to use it?
+## 📋 Table of Contents
+<details>
+<summary>Click to reveal</summary>
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
+- [About](#-about)
+- [Requirements](#-requirements)
+- [Building](#-building)
+- [Usage](#-usage)
+- [Authors](#-authors)
 
-```bash
-npx create-next-app --example with-typescript with-typescript-app
-```
+</details>
 
-```bash
-yarn create next-app --example with-typescript with-typescript-app
-```
+## 🔍 About
 
-```bash
-pnpm create next-app --example with-typescript with-typescript-app
-```
+[Area](https://en.wikipedia.org/wiki/API) is a 3rd year Epitech project about creating an IFTTT-like web client and mobile app.
 
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+## 💻 Requirements
 
-## Notes
+Supported operating systems:
+- Windows (tested on Windows 10 Home 21H1 x64)
+- Linux (tested on Ubuntu 2204 and Fedora 32)
+- MacOS
 
-This example shows how to integrate the TypeScript type system into Next.js. Since TypeScript is supported out of the box with Next.js, all we have to do is to install TypeScript.
+Dependencies:
+- [Docker](https://www.docker.com/)
 
-```
-npm install --save-dev typescript
-```
+## 🔧 Building
 
-To enable TypeScript's features, we install the type declarations for React and Node.
+- Launch docker.
+- Run `docker compose build`
+- Run `docker compose up`
 
-```
-npm install --save-dev @types/react @types/react-dom @types/node
-```
+## 🎮 Usage
 
-When we run `next dev` the next time, Next.js will start looking for any `.ts` or `.tsx` files in our project and builds it. It even automatically creates a `tsconfig.json` file for our project with the recommended settings.
+You can register with an email and password or through your Google account
 
-Next.js has built-in TypeScript declarations, so we'll get autocompletion for Next.js' modules straight away.
+Once registered you'll be on the dashboard page
 
-A `type-check` script is also added to `package.json`, which runs TypeScript's `tsc` CLI in `noEmit` mode to run type-checking separately. You can then include this, for example, in your `test` scripts.
+There's a disconnect button at the top right to disconnect your account and you can reconnect (different than register, click the link in the little message below)
+
+There's also a Dashboard button to go to the dashboard page (when in a brick which are talked about down below) and a Services button where you can connect to your Twitter and/or Twitch accounts to use them later
+
+On the dashboard page you can create a new brick by clicking the "+" button
+
+On the brick creation popup that just appeared you can give (or not) the brick's name and/or description
+
+Once the brick is created you can click on its "Edit" button to edit its name/description or delete it (or cancel the Edit)
+
+Bricks hold their own action/reactions connections, feel free to organize your services tasks through them
+
+When you click on a brick (anywhere but on its "Edit" button) you'll access it
+
+In a brick you can create either actions (which will trigger every x seconds/minutes depending on the service and type of action) or reactions (which will take the output from reactions and execute a task with it) by clicking on their appropriate "+" buttons.
+
+The creation popup contains:
+- The service (actions have no-authentification services like clock, weather, cypto or One Piece and also auth ones like Twitter and Twitch if you connected to them, reactions only have auth those 2 auth ones)
+- The action/reaction type (like get all tweets from an user, get all streamers on Minecraft, activate when a time is reached etc...)
+- The arguments to give to that action/reaction (tooltip appears when the mouse hovers the text area)
+- The description (not mandatory)
+
+You can then, just like for bricks, click on the "Edit" button of each action/reaction to modify any of its explained-above fields or delete them (or cancel the edit).
+
+## 🤝 Authors
+
+[Pierre HAMEL](https://github.com/pierre1754) • [Dorian AYOUL](https://github.com/NairodGH) • [Jean-Baptiste BROCHERIE](https://github.com/Parumezan) • [Pierre MAUGER](https://github.com/PierreMauger) • [Xavier TONNELLIER](https://github.com/XavTo)
