@@ -1,92 +1,66 @@
-# Client mobile
+# <p align="center">📱 Mobile app 🌐</p>
 
+<p align="center">
+  <a href="https://en.wikipedia.org/wiki/API">
+  <img src="https://cdn.discordapp.com/attachments/1021809556625559634/1082065742771527680/image.png">
+</p>
 
+## 📋 Table of Contents
+<details>
+<summary>Click to reveal</summary>
 
-## Getting started
+- [About](#-about)
+- [Requirements](#-requirements)
+- [Building](#-building)
+- [Usage](#-usage)
+- [Authors](#-authors)
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+</details>
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## 🔍 About
 
-## Add your files
+[Area](https://en.wikipedia.org/wiki/API) is a 3rd year Epitech project about creating an IFTTT-like web client and mobile app.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## 💻 Requirements
 
-```
-cd existing_repo
-git remote add origin https://gitlab.com/areamogus/client-mobile.git
-git branch -M main
-git push -uf origin main
-```
+Supported operating systems:
+- Android
 
-## Integrate with your tools
+## 🔧 Building
 
-- [ ] [Set up project integrations](https://gitlab.com/areamogus/client-mobile/-/settings/integrations)
+- Get the apk from http://localhost:8081/client.apk (refer to the client-web and server ReadMEs to set them up)
+- Run the apk by taping it
 
-## Collaborate with your team
+## 🎮 Usage
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+You can register with an email and password or through your Google account
 
-## Test and Deploy
+Once registered you'll be on the dashboard page
 
-Use the built-in continuous integration in GitLab.
+There's a disconnect button at the top right to disconnect your account and you can reconnect (different than register, click the link in the little message below)
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+There's also a Dashboard button to go to the dashboard page (when in a brick which are talked about down below) and a Services button where you can connect to your Twitter and/or Twitch accounts to use them later
 
-***
+On the dashboard page you can create a new brick by clicking the "+" button
 
-# Editing this README
+On the brick creation popup that just appeared you can give (or not) the brick's name and/or description
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+Once the brick is created you can click on its "Edit" button to edit its name/description or delete it (or cancel the Edit)
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+Bricks hold their own action/reactions connections, feel free to organize your services tasks through them
 
-## Name
-Choose a self-explaining name for your project.
+When you click on a brick (anywhere but on its "Edit" button) you'll access it
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+In a brick you can create either actions (which will trigger every x seconds/minutes depending on the service and type of action) or reactions (which will take the output from reactions and execute a task with it) by clicking on their appropriate "+" buttons.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+The creation popup contains:
+- The service (actions have no-authentification services like clock, weather, cypto or One Piece and also auth ones like Twitter and Twitch if you connected to them, reactions only have auth those 2 auth ones)
+- The action/reaction type (like get all tweets from an user, get all streamers on Minecraft, activate when a time is reached etc...)
+- The arguments to give to that action/reaction (tooltip appears when the mouse hovers the text area)
+- The description (not mandatory)
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+You can then, just like for bricks, click on the "Edit" button of each action/reaction to modify any of its explained-above fields or delete them (or cancel the edit).
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## 🤝 Authors
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+[Pierre HAMEL](https://github.com/pierre1754) • [Dorian AYOUL](https://github.com/NairodGH) • [Jean-Baptiste BROCHERIE](https://github.com/Parumezan) • [Pierre MAUGER](https://github.com/PierreMauger) • [Xavier TONNELLIER](https://github.com/XavTo)

@@ -5,12 +5,6 @@
   <img src="https://cdn.discordapp.com/attachments/1021809556625559634/1082031995611271168/image.png">
 </p>
 
-<p align="center">
-
-    [![pipeline status](https://gitlab.com/areamogus/client-mobile/badges/master/pipeline.svg)](https://gitlab.com/areamogus/client-mobile/-/pipelines?page=1&scope=branches&ref=master)
-
-</p>
-
 ## 📋 Table of Contents
 <details>
 <summary>Click to reveal</summary>
