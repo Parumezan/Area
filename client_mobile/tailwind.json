@@ -4,6 +4,21 @@
 			"position": "absolute"
 		}
 	},
+	"z-10": {
+		"style": {
+			"zIndex": 10
+		}
+	},
+	"z-20": {
+		"style": {
+			"zIndex": 20
+		}
+	},
+	"z-30": {
+		"style": {
+			"zIndex": 30
+		}
+	},
 	"m-auto": {
 		"style": {
 			"marginTop": "auto",
@@ -33,6 +48,11 @@
 	"flex": {
 		"style": {
 			"display": "flex"
+		}
+	},
+	"h-14": {
+		"style": {
+			"height": 56
 		}
 	},
 	"h-32": {

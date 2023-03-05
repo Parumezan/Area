@@ -14,9 +14,6 @@ export default function Action(props: ActionProps) {
   const navigation = useNavigation<NavBarNavigationProp>();
 
   function handleEditPress() {
-    console.log(props.serviceName);
-    // TODO serviceName sus
-
     navigation.navigate('ActionsEdit', {...props});
   }
 

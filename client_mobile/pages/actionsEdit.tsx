@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Button, Input} from '@rneui/themed';
@@ -46,7 +45,10 @@ export default function ActionsEdit() {
     setLoading(true);
     await fetchFormated('/api/action', {
       method: 'POST',
-      body: JSON.stringify({...action}),
+      body: JSON.stringify({
+        ...action,
+        arguments: action.argumentsStr.split('|'),
+      }),
     })
       .then(response => {
         return response.json();
@@ -69,7 +71,10 @@ export default function ActionsEdit() {
     setLoading(true);
     await fetchFormated(`/api/action/${action.id}`, {
       method: 'PATCH',
-      body: JSON.stringify({...action}),
+      body: JSON.stringify({
+        ...action,
+        arguments: action.argumentsStr.split('|'),
+      }),
     })
       .then(response => {
         return response.json();
@@ -149,6 +154,7 @@ export default function ActionsEdit() {
       })
       .catch(err => {
         console.log(err);
+        setError('An error occurred');
       });
     setLoading(false);
   }
@@ -177,6 +183,14 @@ export default function ActionsEdit() {
     }[];
   }
 
+  async function setActionServiceName(value: any) {
+    setAction({...action, serviceName: await value()});
+  }
+
+  async function setActionType(value: any) {
+    setAction({...action, actionType: await value()});
+  }
+
   useEffect(() => {
     fetchService();
     fetchServiceType();
@@ -188,8 +202,8 @@ export default function ActionsEdit() {
         <Container>
           <View style={tw('opacity-100')}>
             {error && <Error errorMsg={error} />}
-            <View style={tw('flex flex-col justify-center pb-5')}>
-              <View style={tw('py-3')}>
+            <View style={tw('flex flex-col justify-center pb-5 z-10')}>
+              <View style={tw('py-3 z-30')}>
                 <DropDownPicker
                   theme="DARK"
                   zIndex={3000}
@@ -206,16 +220,11 @@ export default function ActionsEdit() {
                       : []
                   }
                   setOpen={setOpenService}
-                  setValue={value => {
-                    setAction({
-                      ...action,
-                      serviceName: value.toString(),
-                    });
-                  }}
+                  setValue={setActionServiceName}
                 />
               </View>
 
-              <View style={tw('py-3')}>
+              <View style={tw('py-3 z-20')}>
                 <DropDownPicker
                   theme="DARK"
                   zIndex={1000}
@@ -226,16 +235,10 @@ export default function ActionsEdit() {
                   disabled={!action.serviceName}
                   items={getitems()}
                   setOpen={setOpenTypesList}
-                  setValue={value => {
-                    setAction({
-                      ...action,
-                      actionType: value.toString(),
-                    });
-                  }}
+                  setValue={setActionType}
                 />
               </View>
               <Input
-                disabled={true}
                 style={tw('text-white')}
                 placeholder="arguments"
                 placeholderTextColor="#FFFFFFBD"
@@ -248,7 +251,6 @@ export default function ActionsEdit() {
                 }
               />
               <Input
-                disabled={true}
                 style={tw('text-white')}
                 placeholder="description"
                 placeholderTextColor="#FFFFFFBD"

@@ -2,6 +2,18 @@
   position: absolute
 }
 
+.z-10 {
+  z-index: 10
+}
+
+.z-20 {
+  z-index: 20
+}
+
+.z-30 {
+  z-index: 30
+}
+
 .m-auto {
   margin: auto
 }
@@ -23,6 +35,10 @@
 
 .flex {
   display: flex
+}
+
+.h-14 {
+  height: 3.5rem
 }
 
 .h-32 {
