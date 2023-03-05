@@ -22,12 +22,13 @@ export class AppService {
             actions: [
               {
                 name: 'TIME_IS_X',
-                desctipion: 'Activates when the time is X (ex: 12:00)',
+                description:
+                  'Activates when the time is X (1 argument, ex: 12:00)',
               },
               {
                 name: 'DAY_IS_X_TIME_IS_Y',
-                desctipion:
-                  'Activates when the day is X and the time is Y (ex: Monday, 12:00)',
+                description:
+                  'Activates when the day is X and the time is Y (1 argument, ex: Monday, 12:00)',
               },
             ],
             reactions: [],
@@ -36,9 +37,14 @@ export class AppService {
             name: 'crypto',
             actions: [
               {
-                name: 'CRYPTO_CHECK_PRICE',
-                desctipion:
-                  'Activates when the value exceed the given amount (ex: BTC/ETH 120)',
+                name: 'CRYPTO_CHECK_PRICE_UP',
+                description:
+                  'Activates when the value goes above the given amount (2 arguments, ex: BTC|120)',
+              },
+              {
+                name: 'CRYPTO_CHECK_PRICE_DOWN',
+                description:
+                  'Activates when the value goes below the given amount (2 arguments, ex: ETH|60)',
               },
             ],
             reactions: [],
@@ -47,9 +53,14 @@ export class AppService {
             name: 'weather',
             actions: [
               {
-                name: 'WEATHER_BY_CITY',
-                desctipion:
-                  'Activates when the weather changes in a given city (ex: Paris)',
+                name: 'WEATHER_BY_CITY_UP',
+                description:
+                  'Activates when the temperature goes above a given number in a given city (2 arguments, ex: Hiroshima|4000)',
+              },
+              {
+                name: 'WEATHER_BY_CITY_DOWN',
+                description:
+                  'Activates when the temperature goes below a given number in a given city (2 arguments, ex: Rennes|30)',
               },
             ],
             reactions: [],
@@ -59,7 +70,13 @@ export class AppService {
             actions: [
               {
                 name: 'ONE_PIECE_GET_NEW_EP',
-                desctipion: 'Activates when a new episode is released',
+                description:
+                  'Activates when a new episode is released (no arguments)',
+              },
+              {
+                name: 'ONE_PIECE_GET_NEW_MANGA',
+                description:
+                  'Activates when a new manga is released (no arguments)',
               },
             ],
             reactions: [],
@@ -69,25 +86,35 @@ export class AppService {
             actions: [
               {
                 name: 'GET_TWEETS_FROM_USER',
-                desctipion: 'Activates when a user posts a tweet',
+                description:
+                  'Activates when a given user posts a tweet (1 argument, ex: pichade05)',
               },
             ],
             reactions: [
               {
                 name: 'POST_TWEET_FROM_BOT',
-                desctipion: 'Posts a tweet with the given content',
+                description:
+                  "Posts a tweet from our bot with the given content (1 argument, ex: L'essentiel c'est le plus important et ça c'est le principal)",
               },
               {
                 name: 'LIKE_TWEET',
-                desctipion: 'Likes a tweet for a given tweet id',
+                description:
+                  'Likes a tweet with a given tweet id (1 non-user argument, the tweet id comes from a GET_TWEETS_FROM_USER)',
               },
               {
                 name: 'RETWEET_TWEET',
-                desctipion: 'Retweets a tweet for a given tweet id',
+                description:
+                  'Retweet a tweet with a given tweet id (1 non-user argument, the tweet id comes from a GET_TWEETS_FROM_USER)',
               },
               {
                 name: 'COMMENT_TWEET',
-                desctipion: 'Comments a tweet for a given tweet id',
+                description:
+                  'Comment on a tweet with a given tweet id (1 non-user argument, the tweet id comes from a GET_TWEETS_FROM_USER)',
+              },
+              {
+                name: 'SEND_PRIVATE_MESSAGE_TWITTER',
+                description:
+                  'Send a private message to a given user (2 arguments, ex: artototototo|*explodes your laptop battery*)',
               },
             ],
           },
@@ -96,27 +123,30 @@ export class AppService {
             actions: [
               {
                 name: 'DETECT_STREAMERS_PLAY_GAMES_TWITCH',
-                desctipion:
-                  'Returns a list of streamers playing a given game (ex: Pokemon Emerald)',
+                description:
+                  'Returns a list of streamers playing a given game (1 argument, ex: League of Legends)',
               },
               {
                 name: 'DETECT_USER_STREAM_GAMES_TWITCH',
-                desctipion:
-                  'Activates when a streamer starts playing a given game (ex: username, League of Legends)',
+                description:
+                  'Activates when a given streamer starts playing a given game (2 arguments, ex: pierre1754|Genshin Impact)',
               },
             ],
             reactions: [
               {
                 name: 'SEND_WHISPERS_TWITCH',
-                desctipion: 'Sends a whisper to a given user',
+                description:
+                  'Sends a whisper to a given user (2 arguments, ex: nairodtwitch|ratio',
               },
               {
                 name: 'BLOCK_USER_TWITCH',
-                desctipion: 'Sends a whisper to a given user id',
+                description:
+                  'Block a given user (infinite arguments, ex: arto|artoto|artototo|artotototo|artototototo|artotototototo|...',
               },
               {
                 name: 'UNBLOCK_USER_TWITCH',
-                desctipion: 'Sends a whisper to a given user id',
+                description:
+                  'Unblock a given user (infinite arguments, ex: arto|artoto|artototo|artotototo|artototototo|artotototototo|...',
               },
             ],
           },

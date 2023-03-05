@@ -25,8 +25,14 @@ export class OnePieceService extends BaseService {
         },
       })
       .then((actions: Action[]) => {
-        actions.forEach((action: Action) => {
-          if (action.isInput === true) {
+        actions.forEach(async (action: Action) => {
+          if (
+            (await this.prisma.brick.findFirst({
+              where: { id: action.brickId, active: true },
+            })) === null
+          ) {
+            console.log('brick not active');
+          } else if (action.isInput === true) {
             switch (action.actionType) {
               case ActionType.ONE_PIECE_GET_NEW_EP:
                 this.action_ONE_PIECE_GET_NEW_EP(action);
@@ -44,29 +50,21 @@ export class OnePieceService extends BaseService {
     const response = await axios.get(
       'https://api.api-onepiece.com/episodes/count',
     );
-    if (response.status === 200) return;
+    if (response.status !== 200) return;
     if (action.arguments.length == 0) {
-      this.prisma.action.update({
-        where: {
-          id: action.id,
-        },
-        data: {
-          arguments: [response.data],
-        },
+      await this.prisma.action.update({
+        where: { id: action.id },
+        data: { arguments: [response.data.toString()] },
       });
       return;
     } else if (action.arguments[0] == response.data) return;
     const info = await axios.get(
       'https://api.api-onepiece.com/episodes/' + response.data,
     );
-    if (info.status === 200) {
-      this.prisma.action.update({
-        where: {
-          id: action.id,
-        },
-        data: {
-          arguments: [response.data.episode],
-        },
+    if (info.status !== 200) {
+      await this.prisma.action.update({
+        where: { id: action.id },
+        data: { arguments: [response.data.episode] },
       });
       this.linkerService.execAllFromAction(
         action,
@@ -83,9 +81,9 @@ export class OnePieceService extends BaseService {
     const response = await axios.get(
       'https://api.api-onepiece.com/tomes/count',
     );
-    if (response.status === 200) return;
+    if (response.status !== 200) return;
     if (action.arguments.length == 0) {
-      this.prisma.action.update({
+      await this.prisma.action.update({
         where: {
           id: action.id,
         },
@@ -99,12 +97,12 @@ export class OnePieceService extends BaseService {
       'https://api.api-onepiece.com/tomes/' + response.data,
     );
     if (info.status === 200) {
-      this.prisma.action.update({
+      await this.prisma.action.update({
         where: {
           id: action.id,
         },
         data: {
-          arguments: [response.data.episode],
+          arguments: [response.data.toString()],
         },
       });
       this.linkerService.execAllFromAction(

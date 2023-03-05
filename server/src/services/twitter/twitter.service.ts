@@ -55,11 +55,19 @@ export class TwitterService extends BaseService {
       })
       .then((services) => {
         const actions = services.flatMap((service) => service.action);
-        actions.forEach((action: Action) => {
-          switch (action.actionType) {
-            case ActionType.GET_TWEETS_FROM_USER:
-              this.action_GET_NEW_TWEET_FROM_USER(action);
-              break;
+        actions.forEach(async (action: Action) => {
+          if (
+            (await this.prisma.brick.findFirst({
+              where: { id: action.brickId, active: true },
+            })) === null
+          ) {
+            console.log('brick not active');
+          } else if (action.isInput === true) {
+            switch (action.actionType) {
+              case ActionType.GET_TWEETS_FROM_USER:
+                this.action_GET_NEW_TWEET_FROM_USER(action);
+                break;
+            }
           }
         });
       });
@@ -117,7 +125,7 @@ export class TwitterService extends BaseService {
         );
       });
     } catch (err) {
-      throw new Error('Error getting twitter token');
+      console.log(err);
     }
     return requestToken;
   }
@@ -148,7 +156,7 @@ export class TwitterService extends BaseService {
       );
       return accessToken;
     } catch (err) {
-      throw new Error('Error getting twitter access token');
+      console.log(err);
     }
   }
 
@@ -164,14 +172,21 @@ export class TwitterService extends BaseService {
       access_token: service.serviceToken,
       access_token_secret: service.serviceTokenSecret,
     });
-    const tweet = await client.get('statuses/user_timeline', {
-      screen_name: action.arguments[0],
-      count: 1,
-    });
+    let tweet = null;
+    try {
+      tweet = await client.get('statuses/user_timeline', {
+        screen_name: action.arguments[0],
+        count: 1,
+      });
+    } catch (err) {
+      console.log(err);
+      return;
+    }
     if (tweet.data.length == 0) return;
     if (action.arguments.length < 2) {
+      action.arguments.push(tweet.data[0]?.id_str);
       action.arguments.push(tweet.data[0]?.text);
-      this.prisma.action.update({
+      await this.prisma.action.update({
         where: {
           id: action.id,
         },
@@ -180,21 +195,28 @@ export class TwitterService extends BaseService {
         },
       });
     }
-    if (action.arguments[1] == tweet.data[0]?.text) return;
-    this.prisma.action.update({
+    if (action.arguments[1] == tweet.data[0]?.id_str) {
+      console.log('no new tweet');
+      return;
+    }
+    await this.prisma.action.update({
       where: {
         id: action.id,
       },
       data: {
-        arguments: [action.arguments[0], tweet.data[0]?.text],
+        arguments: [
+          action.arguments[0],
+          tweet.data[0]?.id_str,
+          tweet.data[0]?.text,
+        ],
       },
     });
     this.linkerService.execAllFromAction(
       action,
-      [tweet.data[0]?.text],
+      [action.arguments[0], tweet.data[0]?.id_str, tweet.data[0]?.text],
       this.prisma,
     );
-    return tweet.data[0]?.text;
+    return;
   }
 
   async action_POST_TWEET(action: Action, prisma: PrismaClient) {
@@ -244,7 +266,7 @@ export class TwitterService extends BaseService {
       access_token: service.serviceToken,
       access_token_secret: service.serviceTokenSecret,
     });
-    const tweetID = action.arguments[0];
+    const tweetID = action.arguments[1];
     T.post('favorites/create', { id: tweetID }, (err, data, response) => {
       if (err) {
         console.error(err);
@@ -266,10 +288,10 @@ export class TwitterService extends BaseService {
       access_token: service.serviceToken,
       access_token_secret: service.serviceTokenSecret,
     });
-    const tweetID = action.arguments[0];
+    const tweetID = action.arguments[1];
     T.post('statuses/retweet/:id', { id: tweetID }, (err, data, response) => {
       if (err) {
-        console.error(err);
+        console.log(err);
       } else {
         console.log(`Successfully retweeted tweet: ${tweetID}`);
       }
@@ -288,14 +310,14 @@ export class TwitterService extends BaseService {
       access_token: service.serviceToken,
       access_token_secret: service.serviceTokenSecret,
     });
-    const tweetID = action.arguments[0];
-    const comment = action.arguments[1];
+    const tweetID = action.arguments[2];
+    const comment = '@' + action.arguments[1] + ' ' + action.arguments[0];
     T.post(
       'statuses/update',
-      { status: comment, in_reply_to_status_id: tweetID },
+      { in_reply_to_status_id: tweetID, status: comment },
       (err, data, response) => {
         if (err) {
-          console.error(err);
+          console.log(err);
         } else {
           console.log(`Successfully commented on tweet: ${tweetID}`);
         }
@@ -303,18 +325,8 @@ export class TwitterService extends BaseService {
     );
   }
 
-  getIdByUsername(username: string) {
-    const T = new Twit({
-      consumer_key: env.TWITTER_CONSUMER_KEY,
-      consumer_secret: env.TWITTER_CONSUMER_SECRET,
-    });
-    T.get('users/lookup', { screen_name: username }, (err, data, response) => {
-      if (err) {
-        console.error(err);
-      } else {
-        return data[0].id_str;
-      }
-    });
+  async getIdByUsername(username: string, T: Twit) {
+    return await T.get('users/lookup', { screen_name: username });
   }
 
   async action_SEND_PRIVATE_MESSAGE(action: Action, prisma: PrismaClient) {
@@ -323,25 +335,40 @@ export class TwitterService extends BaseService {
         id: action.serviceId,
       },
     });
-    const T = new Twit({
+    const T: Twit = await new Twit({
       consumer_key: env.TWITTER_CONSUMER_KEY,
       consumer_secret: env.TWITTER_CONSUMER_SECRET,
       access_token: service.serviceToken,
       access_token_secret: service.serviceTokenSecret,
     });
-    const recipient = this.getIdByUsername(action.arguments[0]);
-    const message = action.arguments[1];
-    T.post(
+    if (/^\d+$/.test(action.arguments[0]) == false) {
+      const recipient = await this.getIdByUsername(action.arguments[0], T).then(
+        (res) => {
+          return res?.data[0]?.id_str;
+        },
+      );
+      if (recipient == undefined) return;
+      action.arguments[0] = recipient;
+      await prisma.action.update({
+        where: {
+          id: action.id,
+        },
+        data: {
+          arguments: action.arguments,
+        },
+      });
+    }
+    await T.post(
       'direct_messages/events/new',
       {
         event: {
           type: 'message_create',
           message_create: {
             target: {
-              recipient_id: recipient,
+              recipient_id: action.arguments[0],
             },
             message_data: {
-              text: message,
+              text: action.arguments[1],
             },
           },
         },
@@ -351,8 +378,10 @@ export class TwitterService extends BaseService {
           console.error(err);
           return null;
         } else {
-          console.log(`Successfully sent private message to ${recipient}`);
-          return recipient;
+          console.log(
+            `Successfully sent private message to ${action.arguments[0]}`,
+          );
+          return action.arguments[0];
         }
       },
     );
