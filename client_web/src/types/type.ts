@@ -24,6 +24,8 @@ export const servicesMap: {
     OnePiece: {
       ONE_PIECE_GET_NEW_EP:
         "Activates when a new episode is released (no arguments)",
+      ONE_PIECE_GET_NEW_MANGA:
+        "Activates when a new manga is released (no arguments)",
     },
     Twitch: {
       DETECT_STREAMERS_PLAY_GAMES_TWITCH:
