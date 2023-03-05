@@ -53,11 +53,16 @@ export class TwitterController {
     },
   })
   async twitterCallback(@Body() body, @Req() req: any): Promise<string> {
-    const token = await this.twitterService.getTwitterAccessToken(
-      body.oauthToken,
-      body.oauthVerifier,
-    );
-    this.twitterService.addTokenToDatabase(token, req.user.id);
+    try {
+      const token = await this.twitterService.getTwitterAccessToken(
+        body.oauthToken,
+        body.oauthVerifier,
+      );
+      this.twitterService.addTokenToDatabase(token, req.user.id);
+    } catch (e) {
+      console.log(e);
+      return 'Error';
+    }
     return 'Success';
   }
 }

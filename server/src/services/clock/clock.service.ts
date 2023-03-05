@@ -42,7 +42,6 @@ export class ClockService extends BaseService {
   async action_TIME_IS_X(action: Action) {
     if (action.arguments.length === 0) return;
     const time = action.arguments[0];
-
     fetch('http://worldtimeapi.org/api/timezone/Europe/Paris')
       .then((response) => response.json())
       .then((data) => {

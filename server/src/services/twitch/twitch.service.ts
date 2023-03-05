@@ -213,7 +213,6 @@ export class TwitchService extends BaseService {
       if (response.data.data.length == 0) return -1;
       const game = response.data.data[0];
       const gameId = game.id;
-      console.log(gameId);
       return gameId;
     } catch (error) {
       if (error.response.status == 401) {
@@ -227,7 +226,6 @@ export class TwitchService extends BaseService {
         const tokens = await this.refreshToken(serv.serviceTokenSecret);
         return await this.getIdByNameGame(gameName, tokens.access_token);
       }
-      console.log(gameName);
       console.log('Error getting game ID:', error.response.data);
       return -1;
     }

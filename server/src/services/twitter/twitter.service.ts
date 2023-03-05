@@ -195,10 +195,7 @@ export class TwitterService extends BaseService {
         },
       });
     }
-    if (action.arguments[1] == tweet.data[0]?.id_str) {
-      console.log('no new tweet');
-      return;
-    }
+    if (action.arguments[1] == tweet.data[0]?.id_str) return;
     await this.prisma.action.update({
       where: {
         id: action.id,
@@ -244,14 +241,6 @@ export class TwitterService extends BaseService {
         }
       },
     );
-    await prisma.action.update({
-      where: {
-        id: action.id,
-      },
-      data: {
-        actionType: ActionType.NULL,
-      },
-    });
   }
 
   async action_LIKE_TWEET(action: Action, prisma: PrismaClient) {
