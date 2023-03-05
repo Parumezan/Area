@@ -1,9 +1,17 @@
-import {ServiceProps} from './ServicesProps';
-
 export interface ActionProps {
   id: number;
-  service: ServiceProps;
+  serviceName: string;
   description: string;
-  isReaction: boolean;
   arguments: string[];
+  brickId: number;
+  serviceId: number;
+  actionType: string;
+  isInput: boolean;
 }
+
+export type ServiceType = {
+  service: string;
+  isInput: boolean;
+  type: string;
+  description: string;
+};

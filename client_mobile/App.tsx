@@ -11,6 +11,7 @@ import Register from './pages/register';
 import BrickEdit from './pages/brickEdit';
 import Services from './pages/services';
 import Actions from './pages/actions';
+import ActionsEdit from './pages/actionsEdit';
 
 const RootStack = createStackNavigator<RootStackParamList>();
 
@@ -25,6 +26,7 @@ export default function App() {
           <RootStack.Screen name="Services" component={Services} />
           <RootStack.Screen name="BrickEdit" component={BrickEdit} />
           <RootStack.Screen name="Actions" component={Actions} />
+          <RootStack.Screen name="ActionsEdit" component={ActionsEdit} />
         </RootStack.Navigator>
       </NavigationContainer>
     </TailwindProvider>

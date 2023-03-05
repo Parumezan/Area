@@ -22,10 +22,6 @@ export default function Services() {
   const tw = useTailwind();
   const navigation = useNavigation<ServicesNavigationProp>();
 
-  async function googleLogin() {
-    // do it
-  }
-
   async function twitterLogin() {
     // do it
   }
@@ -35,11 +31,6 @@ export default function Services() {
   }
 
   const services: Service[] = [
-    {
-      name: 'Google',
-      img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/2048px-Google_%22G%22_Logo.svg.png',
-      login: googleLogin,
-    },
     {
       name: 'Twitter',
       img: 'https://www.icsdevon.co.uk/wp-content/uploads/2021/09/Twitter-logo.png',

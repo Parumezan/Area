@@ -1,3 +1,4 @@
+import {ActionProps} from './ActionProps';
 import {BrickProps} from './BrickProps';
 
 export type RootStackParamList = {
@@ -7,6 +8,7 @@ export type RootStackParamList = {
   Services: undefined;
   Actions: {id: number};
   BrickEdit: BrickProps;
+  ActionsEdit: {brickId: number} & ActionProps;
 
   // Add more screens here
 };

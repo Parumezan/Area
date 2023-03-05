@@ -11,6 +11,11 @@
   margin-right: auto
 }
 
+.my-1 {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem
+}
+
 .my-auto {
   margin-top: auto;
   margin-bottom: auto
@@ -18,10 +23,6 @@
 
 .flex {
   display: flex
-}
-
-.h-16 {
-  height: 4rem
 }
 
 .h-32 {
@@ -182,6 +183,11 @@
 .py-2 {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem
+}
+
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem
 }
 
 .pb-3 {
